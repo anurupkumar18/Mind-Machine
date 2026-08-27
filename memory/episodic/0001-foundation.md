@@ -6,7 +6,7 @@ Establish the evidence-engine foundation and first graph-traversal vertical slic
 
 ## Changed files
 
-Added repo guidance, reviewed shared-memory records, a repo-scoped delivery skill, data-driven BFS fixture, FastAPI evidence runtime, Next.js visual workspace, CI, and Vercel/Render configuration.
+Added repo guidance, reviewed shared-memory records, a repo-scoped delivery skill, data-driven BFS fixture, FastAPI evidence runtime, Next.js visual workspace, CI, Vercel/Render configuration, and an allowlisted public-fixture CodeContext adapter.
 
 ## Validation evidence
 
@@ -22,4 +22,4 @@ Shared team.
 
 ## Next action
 
-Add a second public fixture or begin the Phase 2 public-repository adapter without changing the deterministic evidence boundary.
+Expose the approved CodeContext/candidate in the visual workspace or add a second allowlisted fixture without changing the deterministic evidence boundary.

@@ -107,3 +107,16 @@ class ChallengeTemplate(BaseModel):
     verifier: str
     evidence_schema: list[str]
 
+
+class CodeFile(BaseModel):
+    path: str
+    language: str
+    symbols: list[str]
+    line_count: int
+
+
+class CodeContext(BaseModel):
+    repository_id: str
+    source: str
+    files: list[CodeFile]
+    excluded_files: list[str]

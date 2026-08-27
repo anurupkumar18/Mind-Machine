@@ -6,8 +6,10 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.domain.contracts import (
+    ChallengeCandidate,
     CheckpointRequest,
     CheckpointResponse,
+    CodeContext,
     EvidenceRequest,
     EvidenceResponse,
     PredictionRequest,
@@ -17,6 +19,7 @@ from app.domain.contracts import (
 )
 from app.domain.interpretation import interpret_evidence
 from app.domain.policy import select_coaching_card
+from app.domain.repo_context import approved_context, curated_candidate
 from app.domain.runtime import allowlisted_repair_passes, canonical_next_frontier
 
 app = FastAPI(title="Evidence Engine API", version="0.1.0")
@@ -32,6 +35,22 @@ app.add_middleware(
 @app.get("/health")
 def health() -> dict[str, str]:
     return {"status": "ok", "persistence": "none"}
+
+
+@app.get("/code-context/{repository_id}", response_model=CodeContext)
+def code_context(repository_id: str) -> CodeContext:
+    try:
+        return approved_context(repository_id)
+    except KeyError as error:
+        raise HTTPException(status_code=404, detail="Repository is not an approved public fixture.") from error
+
+
+@app.get("/challenge-candidates/{repository_id}", response_model=list[ChallengeCandidate])
+def challenge_candidates(repository_id: str) -> list[ChallengeCandidate]:
+    try:
+        return [curated_candidate(approved_context(repository_id))]
+    except KeyError as error:
+        raise HTTPException(status_code=404, detail="Repository is not an approved public fixture.") from error
 
 
 @app.post("/checkpoint", response_model=CheckpointResponse)

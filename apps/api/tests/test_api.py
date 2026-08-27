@@ -56,3 +56,16 @@ def test_local_browser_origin_is_allowed_for_preflight() -> None:
     )
     assert response.status_code == 200
     assert response.headers["access-control-allow-origin"] == "http://127.0.0.1:3000"
+
+
+def test_only_approved_public_fixture_has_code_context_and_candidate() -> None:
+    context = client.get("/code-context/public-graph-traversal")
+    assert context.status_code == 200
+    assert context.json()["files"][0]["symbols"] == ["bfs"]
+
+    candidate = client.get("/challenge-candidates/public-graph-traversal")
+    assert candidate.status_code == 200
+    assert candidate.json()[0]["template_id"] == "TRAVERSAL-INVARIANT-02"
+
+    rejected = client.get("/code-context/user-upload")
+    assert rejected.status_code == 404
