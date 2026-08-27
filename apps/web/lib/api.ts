@@ -1,6 +1,13 @@
-import type { CoachingCard, EvidenceResponse, Plan, PolicyMode } from "./types";
+import type { ChallengeCandidate, CoachingCard, CodeContext, EvidenceResponse, Plan, PolicyMode } from "./types";
 
 const baseUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+const approvedRepositoryId = "public-graph-traversal";
+
+async function get<T>(path: string): Promise<T> {
+  const response = await fetch(`${baseUrl}${path}`);
+  if (!response.ok) throw new Error("The evidence service could not load the approved challenge context.");
+  return response.json() as Promise<T>;
+}
 
 async function post<T>(path: string, body: unknown): Promise<T> {
   const response = await fetch(`${baseUrl}${path}`, {
@@ -15,6 +22,14 @@ async function post<T>(path: string, body: unknown): Promise<T> {
 export async function submitCheckpoint(plan: Plan, policyMode: PolicyMode): Promise<CoachingCard> {
   const response = await post<{ accepted: boolean; card: CoachingCard }>("/checkpoint", { plan, policy_mode: policyMode });
   return response.card;
+}
+
+export function getApprovedCodeContext(): Promise<CodeContext> {
+  return get<CodeContext>(`/code-context/${approvedRepositoryId}`);
+}
+
+export function getApprovedChallengeCandidates(): Promise<ChallengeCandidate[]> {
+  return get<ChallengeCandidate[]>(`/challenge-candidates/${approvedRepositoryId}`);
 }
 
 export function submitPrediction(predictedFrontier: string[]) {
@@ -36,4 +51,3 @@ export function getEvidence(input: {
 }): Promise<EvidenceResponse> {
   return post<EvidenceResponse>("/evidence", input);
 }
-

@@ -24,3 +24,30 @@ export type EvidenceResponse = {
   next_action: string;
 };
 
+export type CodeFile = {
+  path: string;
+  language: string;
+  symbols: string[];
+  line_count: number;
+};
+
+export type CodeContext = {
+  repository_id: string;
+  source: string;
+  files: CodeFile[];
+  excluded_files: string[];
+};
+
+export type CodeReference = {
+  file: string;
+  start_line: number;
+  end_line: number;
+};
+
+export type ChallengeCandidate = {
+  objective_ref: string;
+  code_refs: CodeReference[];
+  template_id: string;
+  evidence_plan: string[];
+  rationale: string;
+};
