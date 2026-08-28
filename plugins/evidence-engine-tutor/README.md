@@ -14,7 +14,8 @@ persists learner data, adds telemetry, scores, or determines pass/fail.
 3. Invoke `evidence-engine-tutor` and ask to start a read-only codebase
    onboarding session.
 4. Reply `yes`; confirm that the returned map names only supported files,
-   metadata, symbols, imports, and entry points, with path/line anchors.
+   metadata (including nested app manifests), symbols, imports, and entry
+   points, with a single `path:L<line>` anchor per factual statement.
 5. Confirm that it says no project code ran, no files changed, and no learner
    data was stored.
 

@@ -31,6 +31,8 @@ def main() -> None:
         "Do not use `rg`, read other",
         "files, run tests",
         "no project code ran, no files changed",
+        "do not duplicate a prose line",
+        "candidate entry point",
     ):
         assert boundary in skill, boundary
     mapper = PLUGIN / "scripts" / "map_workspace.py"

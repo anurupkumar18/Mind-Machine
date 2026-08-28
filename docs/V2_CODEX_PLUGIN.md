@@ -13,8 +13,9 @@ commands, edit a project, add persistence, or produce a score.
 ## Slice 2: read-only source map
 
 After an exact `yes` in the current conversation, the bundled mapper reads only
-JavaScript, TypeScript, Python, `package.json`, and `pyproject.toml`. It returns
-paths, symbol line anchors, imports, entry-point candidates, and limitations.
+JavaScript, TypeScript, Python, and nested `package.json`/`pyproject.toml`
+files. It returns paths, symbol line anchors, imports, entry-point candidates,
+and limitations.
 The mapper does not import or execute project code, use project commands, or
 write into the mapped workspace.
 

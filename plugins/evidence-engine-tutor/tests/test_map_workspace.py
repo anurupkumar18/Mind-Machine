@@ -17,7 +17,7 @@ class WorkspaceMapTests(unittest.TestCase):
         result = MODULE.map_workspace(ROOT / "tests" / "fixtures" / "sample-workspace")
 
         self.assertEqual(result["scope"], "read-only source and metadata map")
-        self.assertEqual(result["metadata_files"], ["package.json"])
+        self.assertEqual(result["metadata_files"], ["apps/api/pyproject.toml", "apps/web/package.json"])
         self.assertEqual(result["detected_languages"], ["python", "typescript"])
         self.assertIn("src/index.ts", result["entrypoints"])
         self.assertNotIn("worker.py", result["entrypoints"])

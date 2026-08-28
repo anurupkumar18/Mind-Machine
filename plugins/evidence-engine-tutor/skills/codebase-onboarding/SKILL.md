@@ -60,10 +60,13 @@ conceptual."
 - Present the mapper result in this structure:
   1. **What happened:** name the metadata files and supported languages found.
   2. **Your project map:** list entry points, then no more than six mapped files
-     with path, named symbols, and imports. Cite every statement with the
-     returned path and line anchor.
+     with path, named symbols, and imports. Cite every statement once as
+     `path:L<line>` from the returned anchor; do not duplicate a prose line
+     label and a linked line label.
   3. **Why these files matter:** explain one visible import or entry-point
-     relationship without claiming correctness.
+     relationship without claiming correctness or a role the mapper cannot
+     establish. Call an entry point a "candidate entry point" unless the
+     source-map evidence itself establishes more.
   4. **Choose your next view:** offer **Explorer** (one guided navigation),
      **Builder** (one concise execution-path question), or **Reviewer** (one
      boundary/trade-off question). Do not infer a mode or score the learner.

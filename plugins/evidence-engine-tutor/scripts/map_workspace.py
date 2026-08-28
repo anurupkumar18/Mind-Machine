@@ -16,6 +16,7 @@ from typing import Any
 
 LANGUAGES = {".js": "javascript", ".jsx": "javascript", ".ts": "typescript", ".tsx": "typescript", ".py": "python"}
 EXCLUDED_DIRECTORIES = {".git", ".next", ".venv", "__pycache__", "build", "coverage", "dist", "node_modules", "venv"}
+METADATA_EXCLUDED_DIRECTORIES = EXCLUDED_DIRECTORIES | {"test", "tests"}
 MAX_FILE_BYTES = 500_000
 PYTHON_SYMBOL = re.compile(r"^(?:async\s+)?(?:def|class)\s+(?P<name>[A-Za-z_]\w*)", re.MULTILINE)
 JS_SYMBOL = re.compile(r"^(?:export\s+)?(?:default\s+)?(?:async\s+)?(?:function|class|const|let)\s+(?P<name>[A-Za-z_$][\w$]*)", re.MULTILINE)
@@ -33,6 +34,17 @@ def source_files(root: Path) -> Iterable[Path]:
             continue
         if path.is_file() and path.suffix in LANGUAGES and path.stat().st_size <= MAX_FILE_BYTES:
             yield path
+
+
+def metadata_files(root: Path) -> list[str]:
+    matches: list[str] = []
+    for path in sorted(root.rglob("*")):
+        relative = path.relative_to(root)
+        if any(part in METADATA_EXCLUDED_DIRECTORIES or part.startswith(".env") for part in relative.parts):
+            continue
+        if path.is_file() and path.name in {"package.json", "pyproject.toml"}:
+            matches.append(relative.as_posix())
+    return matches
 
 
 def symbols_for(text: str, language: str) -> list[dict[str, Any]]:
@@ -76,11 +88,10 @@ def map_workspace(root: Path) -> dict[str, Any]:
         if entrypoint(Path(relative), text):
             entrypoints.append(relative)
 
-    metadata = [path.name for path in (root / "package.json", root / "pyproject.toml") if path.is_file()]
     return {
         "scope": "read-only source and metadata map",
         "workspace": root.name,
-        "metadata_files": metadata,
+        "metadata_files": metadata_files(root),
         "detected_languages": sorted(languages),
         "entrypoints": entrypoints,
         "files": files,
