@@ -12,7 +12,7 @@ The Evidence Engine verifies whether a learner can reason about and repair AI-as
 
 The hosted MVP accepts a public prompt and uses one synthetic Python graph fixture. It has no login, persistence, Canvas/GitHub integration, repository upload, arbitrary code execution, or model API.
 
-Phase 2 exposes only an allowlisted, synthetic public-code fixture through `CodeContext`; arbitrary URLs and user repositories remain rejected until an explicitly approved adapter exists.
+Phase 2 exposes only an allowlisted, synthetic public-code fixture through `CodeContext`; arbitrary URLs and user repositories remain rejected in the hosted product. The private Codex V2 preview is a separate, explicit-consent local adapter: it may read only the authorized open workspace to produce a bounded source map, and may never upload it through an app-owned service, execute project code, or persist learner data.
 
 ## Architecture
 

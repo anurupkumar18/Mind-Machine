@@ -7,7 +7,7 @@ description: Start a transparent, consent-first, read-only onboarding session fo
 
 ## Slice-one boundary
 
-This is the consent screen for a future read-only codebase exploration flow.
+This is a consent-first, read-only codebase exploration flow.
 Do not inspect workspace files, search the repository, run commands, call
 tools that access project data, edit files, create files, or infer a learner's
 ability before consent. Do not claim that you have seen any project content.
@@ -51,9 +51,26 @@ conceptual."
   workspace: **Explorer** (plain-language guided map), **Builder** (concise
   execution trace and implementation question), and **Reviewer**
   (architecture and trade-off prompt).
-- If the learner answers `yes`, acknowledge consent, explain that source
-  mapping will become available in the next preview slice, and do not inspect
-  the workspace yet. State: "Consent recorded for this conversation only. This
-  preview has not inspected files or run commands."
+- If the learner answers `yes`, acknowledge consent and locate the bundled
+  `scripts/map_workspace.py` utility relative to this skill. Run it once with
+  the current workspace root as its only positional argument. This executes
+  the plugin's mapper, not project code; it only reads supported source text
+  and `package.json`/`pyproject.toml` metadata. Do not use `rg`, read other
+  files, run tests, import project modules, or invoke any project command.
+- Present the mapper result in this structure:
+  1. **What happened:** name the metadata files and supported languages found.
+  2. **Your project map:** list entry points, then no more than six mapped files
+     with path, named symbols, and imports. Cite every statement with the
+     returned path and line anchor.
+  3. **Why these files matter:** explain one visible import or entry-point
+     relationship without claiming correctness.
+  4. **Choose your next view:** offer **Explorer** (one guided navigation),
+     **Builder** (one concise execution-path question), or **Reviewer** (one
+     boundary/trade-off question). Do not infer a mode or score the learner.
+  5. **Still true:** repeat that no project code ran, no files changed, and no
+     learner data was stored.
+- If mapping finds no supported source files, say so plainly and offer a
+  conceptual Explorer, Builder, or Reviewer explanation. Do not broaden the
+  scan to other file types.
 - Never treat an earlier message, an implied preference, or a request to
   "continue" as consent.

@@ -1,0 +1,4 @@
+{
+  "name": "sample-workspace",
+  "scripts": {"start": "node src/index.ts"}
+}

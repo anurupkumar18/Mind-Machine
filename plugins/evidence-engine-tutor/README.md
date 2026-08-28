@@ -2,10 +2,10 @@
 
 Private Codex-plugin preview for consent-first codebase onboarding.
 
-The first slice intentionally has no workspace-reading tool, command runner,
-file editor, persistence, telemetry, score, or pass/fail decision. It teaches
-the learner what will happen before later slices introduce read-only source
-mapping.
+After explicit in-conversation consent, this preview runs its own bounded
+mapper over JavaScript, TypeScript, Python, `package.json`, and `pyproject.toml`.
+It never imports or executes project code, runs project commands, edits files,
+persists learner data, adds telemetry, scores, or determines pass/fail.
 
 ## Manual rehearsal
 
@@ -13,8 +13,10 @@ mapping.
 2. Start a new Codex conversation in a workspace.
 3. Invoke `evidence-engine-tutor` and ask to start a read-only codebase
    onboarding session.
-4. Confirm that it asks for explicit consent and clearly states that no files
-   have been inspected, no commands have run, and nothing has been changed.
+4. Reply `yes`; confirm that the returned map names only supported files,
+   metadata, symbols, imports, and entry points, with path/line anchors.
+5. Confirm that it says no project code ran, no files changed, and no learner
+   data was stored.
 
-The next slice may add source inspection only after the learner explicitly
-consents in that conversation.
+The next slice will add learner-selected Explorer, Builder, and Reviewer
+practice interactions over this map.

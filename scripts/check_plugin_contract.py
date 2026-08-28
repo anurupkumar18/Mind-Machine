@@ -27,8 +27,15 @@ def main() -> None:
         "score, mastery estimate",
         "pass/fail judgment",
         "Reply `yes` to continue",
+        "scripts/map_workspace.py",
+        "Do not use `rg`, read other",
+        "files, run tests",
+        "no project code ran, no files changed",
     ):
         assert boundary in skill, boundary
+    mapper = PLUGIN / "scripts" / "map_workspace.py"
+    assert mapper.is_file()
+    assert "exec(" not in mapper.read_text()
 
 
 if __name__ == "__main__":
