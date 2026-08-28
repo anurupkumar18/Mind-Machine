@@ -55,10 +55,18 @@ def symbols_for(text: str, language: str) -> list[dict[str, Any]]:
     ]
 
 
-def imports_for(text: str, language: str) -> list[str]:
+def imports_for(text: str, language: str) -> list[dict[str, Any]]:
     if language == "python":
-        return sorted({next(value for value in match.groups() if value) for match in PYTHON_IMPORT.finditer(text)})
-    return sorted(set(JS_IMPORT.findall(text)))
+        matches = [
+            {"module": next(value for value in match.groups() if value), "line": line_number(text, match.start())}
+            for match in PYTHON_IMPORT.finditer(text)
+        ]
+    else:
+        matches = [
+            {"module": match.group(1), "line": line_number(text, match.start())}
+            for match in JS_IMPORT.finditer(text)
+        ]
+    return sorted(matches, key=lambda item: (item["module"], item["line"]))
 
 
 def entrypoint(path: Path, text: str) -> bool:

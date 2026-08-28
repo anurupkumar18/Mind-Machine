@@ -33,6 +33,11 @@ def main() -> None:
         "no project code ran, no files changed",
         "do not duplicate a prose line",
         "candidate entry point",
+        "Learner-selected map practice",
+        "What is happening",
+        "not a correctness judgment",
+        "Do not label the prediction correct",
+        "Do not approve, reject, rank, or score",
     ):
         assert boundary in skill, boundary
     mapper = PLUGIN / "scripts" / "map_workspace.py"

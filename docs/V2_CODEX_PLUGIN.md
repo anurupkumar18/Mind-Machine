@@ -19,11 +19,19 @@ and limitations.
 The mapper does not import or execute project code, use project commands, or
 write into the mapped workspace.
 
+## Slice 3: learner-selected practice
+
+The existing map supports three transparent views: Explorer asks one guided
+navigation question, Builder asks for a two-step prediction, and Reviewer asks
+for one boundary/trade-off note. Each view explains what is happening and why,
+uses only existing map anchors, and treats the learner response as current
+thinking rather than a score or verdict.
+
 The personal marketplace entry resolves to `~/plugins/evidence-engine-tutor`,
 which is a local symlink to this repository's version-controlled plugin source.
 This keeps manual preview installation separate from public distribution.
 
 ## Next slice
 
-Add learner-selected Explorer, Builder, and Reviewer practice interactions over
-the returned map, without changing the read-only boundary.
+After manual feedback, add a first source-anchored micro-exploration flow
+without changing the read-only boundary.

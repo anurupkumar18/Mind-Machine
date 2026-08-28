@@ -22,7 +22,7 @@ class WorkspaceMapTests(unittest.TestCase):
         self.assertIn("src/index.ts", result["entrypoints"])
         self.assertNotIn("worker.py", result["entrypoints"])
         files = {item["path"]: item for item in result["files"]}
-        self.assertEqual(files["src/index.ts"]["imports"], ["./greet"])
+        self.assertEqual(files["src/index.ts"]["imports"], [{"module": "./greet", "line": 1}])
         self.assertEqual(files["src/index.ts"]["symbols"][0]["name"], "start")
         self.assertEqual(files["worker.py"]["symbols"][0], {"name": "Worker", "line": 4, "kind": "class"})
         self.assertIn("No project code was executed.", result["limitations"])

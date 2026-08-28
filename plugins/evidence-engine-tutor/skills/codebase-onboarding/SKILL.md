@@ -77,3 +77,60 @@ conceptual."
   scan to other file types.
 - Never treat an earlier message, an implied preference, or a request to
   "continue" as consent.
+
+## Learner-selected map practice
+
+Use this section only after a map was produced in the current conversation and
+the learner replies exactly `Explorer`, `Builder`, or `Reviewer`. Reuse that
+map; do not run the mapper again or inspect any additional workspace content.
+If no map exists in this conversation, restart at the consent question.
+
+For every view, begin with **What is happening**, **Why this step**, and
+**Still true**. Cite map facts once as `path:L<line>`. Treat the learner's
+response as their current thinking, never as a grade, mastery signal, or
+pass/fail result.
+
+### Explorer
+
+- **What is happening:** say that the learner is following one visible,
+  read-only connection from a candidate entry point.
+- **Why this step:** explain that tracing a small connection is less
+  overwhelming than reading the whole project at once.
+- Select the first map entry point. If its file has an import, name that import
+  and cite its import line; otherwise select the first named symbol and cite
+  its symbol line. Ask exactly one navigation question: "Open
+  `<anchor>`. In your own words, what responsibility does this visible
+  connection suggest?"
+- **Still true:** no project code ran, no file changed, no learner data was
+  stored, and this is not a correctness judgment.
+
+### Builder
+
+- **What is happening:** say that the learner is making a small execution-path
+  prediction from the map, not implementing or running anything.
+- **Why this step:** explain that a prediction makes the next code-reading
+  decision explicit.
+- Select the first candidate entry point and one import or symbol from that
+  file. Ask exactly one question: "Using only `<entry-anchor>` and
+  `<connection-anchor>`, write the first two steps you predict a request or
+  call would take." If no import exists, use the first symbol as the connection.
+- After the learner replies, restate their wording as a **prediction**, cite
+  the same anchors, and ask what single mapped file they would inspect next.
+  Do not label the prediction correct, incorrect, complete, or incomplete.
+- **Still true:** no project code ran, no file changed, no learner data was
+  stored, and this is not a correctness judgment.
+
+### Reviewer
+
+- **What is happening:** say that the learner is examining a boundary visible
+  in the map and its limitations.
+- **Why this step:** explain that architecture review starts by separating
+  observed structure from assumptions.
+- Cite one entry point and one mapper limitation. Ask exactly one question:
+  "What boundary would you want to preserve before this map could justify a
+  design change?"
+- After the learner replies, reflect it as a **review note** and ask which
+  cited map fact they would gather next. Do not approve, reject, rank, or score
+  the note.
+- **Still true:** no project code ran, no file changed, no learner data was
+  stored, and this is not a correctness judgment.

@@ -18,6 +18,9 @@ persists learner data, adds telemetry, scores, or determines pass/fail.
    points, with a single `path:L<line>` anchor per factual statement.
 5. Confirm that it says no project code ran, no files changed, and no learner
    data was stored.
+6. Reply `Explorer`, `Builder`, and `Reviewer` in separate new conversations.
+   Each should explain its purpose, cite only the existing map, ask one bounded
+   question, and avoid a score or correctness verdict.
 
-The next slice will add learner-selected Explorer, Builder, and Reviewer
-practice interactions over this map.
+The next slice will add a first source-anchored micro-exploration flow after
+manual feedback on the three modes.
