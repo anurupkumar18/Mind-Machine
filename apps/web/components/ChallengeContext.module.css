@@ -1,5 +1,6 @@
 .panel { border-top:4px solid var(--purple); }
 .panel h3 { font-size:.8rem; margin:0 0 8px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); }
+.error { border-top-color:var(--red); } .error h2 { margin-bottom:8px; font-size:1.1rem; } .error p { color:var(--muted); line-height:1.45; }
 .source,.boundary { display:flex; justify-content:space-between; gap:12px; padding:10px 12px; border-radius:9px; background:#f6f5ff; font-size:.82rem; }
 .source span,.boundary span { color:var(--muted); text-align:right; }
 .grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin:16px 0; }

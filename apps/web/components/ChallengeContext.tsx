@@ -4,9 +4,19 @@ import styles from "./ChallengeContext.module.css";
 type ChallengeContextProps = {
   context: CodeContext | null;
   candidate: ChallengeCandidate | null;
+  error: string | null;
+  onRetry: () => void;
 };
 
-export function ChallengeContext({ context, candidate }: ChallengeContextProps) {
+export function ChallengeContext({ context, candidate, error, onRetry }: ChallengeContextProps) {
+  if (error) {
+    return <section className={`panel ${styles.panel} ${styles.error}`} role="alert">
+      <h2>Challenge context unavailable</h2>
+      <p>{error}</p>
+      <button className="secondary" onClick={onRetry}>Retry approved context</button>
+    </section>;
+  }
+
   if (!context || !candidate) {
     return <section className={`panel ${styles.panel}`} aria-busy="true"><p className="muted">Loading approved public challenge context…</p></section>;
   }
