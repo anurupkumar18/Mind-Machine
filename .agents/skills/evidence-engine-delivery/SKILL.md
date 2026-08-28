@@ -5,8 +5,8 @@ description: Build, review, or extend the Evidence Engine using public fixtures,
 
 # Evidence Engine Delivery
 
-1. Read `AGENTS.md`, `memory/INDEX.md`, relevant semantic records, and one episodic handoff.
-2. State the bounded outcome, acceptance criteria, affected contract, and public-data implications.
+1. Read `AGENTS.md`, `memory/INDEX.md`, `docs/VISION.md`, `docs/IMPLEMENTATION_PLAN.md`, relevant semantic records, and one episodic handoff.
+2. State the bounded outcome, acceptance criteria, affected contract, public-data implications, and which phase + task ID from `docs/IMPLEMENTATION_PLAN.md` §6 this work belongs to.
 3. Implement one coherent vertical slice. Keep selection, runtime, evidence, interpretation, and visualization separate.
 4. Put fixture content in `fixtures/`; execute only allowlisted variants. Do not add persistence, arbitrary code execution, private inputs, or a mastery score.
 5. Run the narrowest tests, then `make check` before merge.
