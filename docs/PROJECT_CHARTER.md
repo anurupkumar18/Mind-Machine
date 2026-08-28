@@ -19,3 +19,4 @@ Phase 2 exposes only an allowlisted, synthetic public-code fixture through `Code
 - **Selection:** curated challenge templates now; a provider-neutral candidate interface later.
 - **Evidence:** canonical Python variants and tests, never an LLM grade.
 - **Interpretation:** qualitative, event-level evidence only.
+- **Coaching:** fixture-defined Socratic runbooks may guide a learner through evidence, but never supply a repair implementation or determine pass/fail.
