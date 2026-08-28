@@ -1,6 +1,6 @@
 {
   "name": "evidence-engine-tutor",
-  "version": "0.1.0+codex.20260828044812",
+  "version": "0.1.0+codex.20260828045252",
   "description": "Consent-first, read-only codebase onboarding in Codex.",
   "author": {
     "name": "Evidence Engine contributors"

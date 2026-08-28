@@ -25,7 +25,8 @@ The existing map supports three transparent views: Explorer asks one guided
 navigation question, Builder asks for a two-step prediction, and Reviewer asks
 for one boundary/trade-off note. Each view explains what is happening and why,
 uses only existing map anchors, and treats the learner response as current
-thinking rather than a score or verdict.
+thinking rather than a score or verdict. Builder must never confirm a response
+or claim runtime/fixture behavior from a static map.
 
 The personal marketplace entry resolves to `~/plugins/evidence-engine-tutor`,
 which is a local symlink to this repository's version-controlled plugin source.

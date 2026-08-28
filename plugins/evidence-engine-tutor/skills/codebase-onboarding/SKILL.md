@@ -81,14 +81,24 @@ conceptual."
 ## Learner-selected map practice
 
 Use this section only after a map was produced in the current conversation and
-the learner replies exactly `Explorer`, `Builder`, or `Reviewer`. Reuse that
-map; do not run the mapper again or inspect any additional workspace content.
+the learner replies `Explorer`, `Builder`, or `Reviewer`, ignoring surrounding
+whitespace and letter case. Reuse that map; do not run the mapper again or
+inspect any additional workspace content.
 If no map exists in this conversation, restart at the consent question.
 
 For every view, begin with **What is happening**, **Why this step**, and
 **Still true**. Cite map facts once as `path:L<line>`. Treat the learner's
 response as their current thinking, never as a grade, mastery signal, or
 pass/fail result.
+
+### Critical non-evaluative rule
+
+Never say or imply that a learner is right, wrong, correct, incorrect, good,
+accurate, complete, incomplete, or has demonstrated understanding. Never say
+that their answer is checked. Never claim runtime behavior, fixture comparison,
+or an API result unless that exact fact appears in the source map; this mapper
+does not establish runtime behavior. A source map supports only a prediction,
+an observation of static structure, or a review note.
 
 ### Explorer
 
@@ -114,9 +124,11 @@ pass/fail result.
   file. Ask exactly one question: "Using only `<entry-anchor>` and
   `<connection-anchor>`, write the first two steps you predict a request or
   call would take." If no import exists, use the first symbol as the connection.
-- After the learner replies, restate their wording as a **prediction**, cite
-  the same anchors, and ask what single mapped file they would inspect next.
-  Do not label the prediction correct, incorrect, complete, or incomplete.
+- After the learner replies, use exactly this compact response:
+  - **Your prediction:** neutrally restate their wording without adding a claim.
+  - **Map evidence:** cite only the same entry and connection anchors.
+  - **One next inspection:** ask which one mapped file they would open next.
+  Do not label, refine, confirm, or reject the prediction.
 - **Still true:** no project code ran, no file changed, no learner data was
   stored, and this is not a correctness judgment.
 

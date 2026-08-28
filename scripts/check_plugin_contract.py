@@ -36,13 +36,20 @@ def main() -> None:
         "Learner-selected map practice",
         "What is happening",
         "not a correctness judgment",
-        "Do not label the prediction correct",
         "Do not approve, reject, rank, or score",
+        "ignoring surrounding",
+        "whitespace and letter case",
+        "Critical non-evaluative rule",
+        "Never say or imply that a learner is right, wrong, correct",
+        "Never claim runtime behavior, fixture comparison",
+        "Do not label, refine, confirm, or reject the prediction",
     ):
         assert boundary in skill, boundary
     mapper = PLUGIN / "scripts" / "map_workspace.py"
     assert mapper.is_file()
     assert "exec(" not in mapper.read_text()
+    for prohibited in ("That’s the right", "That is the right", "correctness verdict"):
+        assert prohibited not in skill
 
 
 if __name__ == "__main__":

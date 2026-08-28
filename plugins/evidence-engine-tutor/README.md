@@ -21,6 +21,9 @@ persists learner data, adds telemetry, scores, or determines pass/fail.
 6. Reply `Explorer`, `Builder`, and `Reviewer` in separate new conversations.
    Each should explain its purpose, cite only the existing map, ask one bounded
    question, and avoid a score or correctness verdict.
+   Lowercase mode choices are supported. In Builder follow-ups, verify that the
+   plugin restates the learner's answer as a prediction rather than confirming
+   it or claiming runtime behavior.
 
 The next slice will add a first source-anchored micro-exploration flow after
 manual feedback on the three modes.
