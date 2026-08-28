@@ -75,7 +75,7 @@ test("guides a diagnosis through conceptual confirmation without exposing repair
     "Planned tests": "Cycle and converging-parent graph"
   };
   for (const [label, value] of Object.entries(plan)) await page.getByLabel(label, { exact: true }).fill(value);
-  await page.getByRole("button", { name: "Refresh coaching card" }).click();
+  await page.getByRole("button", { name: "Use this plan to get coaching" }).click();
   await page.getByRole("button", { name: "B", exact: true }).click();
   await page.getByRole("button", { name: "C", exact: true }).click();
   await page.getByRole("button", { name: "Commit prediction & reveal state" }).click();

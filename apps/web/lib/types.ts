@@ -1,5 +1,7 @@
 export type PolicyMode = "no_code_help" | "hints_only";
 
+export type SupportLevel = "guided" | "supported" | "independent";
+
 export type Plan = {
   objective: string;
   strategy: string;

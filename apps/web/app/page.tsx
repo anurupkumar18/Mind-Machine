@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { EvidenceServiceError, getApprovedChallengeCandidates, getApprovedCodeContext, getEvidence, submitCheckpoint, submitConfirmation, submitDiagnosis, submitPrediction } from "../lib/api";
-import type { ChallengeCandidate, CoachingCard, CodeContext, EvidenceResponse, Plan, PolicyMode, SocraticResponse, SocraticSession } from "../lib/types";
+import type { ChallengeCandidate, CoachingCard, CodeContext, EvidenceResponse, Plan, PolicyMode, SocraticResponse, SocraticSession, SupportLevel } from "../lib/types";
 import { ChallengeContext } from "../components/ChallengeContext";
 import { EvidenceMap } from "../components/EvidenceMap";
 import { GraphLab } from "../components/GraphLab";
@@ -12,17 +12,12 @@ import { SocraticCoach } from "../components/SocraticCoach";
 
 const emptyPlan: Plan = { objective: "", strategy: "", representation: "", invariant: "", complexity: "", planned_tests: "" };
 const emptySession: SocraticSession = { phase: "read", diagnosis_attempts: 0, diagnosis_accepted: false, repair_passed: false, retry_scheduled: false };
+const guidedStarterPlan: Plan = { objective: "Explain how BFS explores a graph", strategy: "Use a first-in, first-out queue", representation: "A list of each node's neighbors", invariant: "Mark a node before another parent can add it", complexity: "Visit nodes and edges once: O(V + E)", planned_tests: "A graph where two paths reach the same node" };
 
-function initialPlan(): Plan {
-  if (typeof window === "undefined") return emptyPlan;
-  const saved = window.sessionStorage.getItem("evidence-engine-plan");
-  return saved ? JSON.parse(saved) as Plan : emptyPlan;
-}
-
-function initialSession(): SocraticSession {
-  if (typeof window === "undefined") return emptySession;
-  const saved = window.sessionStorage.getItem("evidence-engine-socratic-session");
-  return saved ? JSON.parse(saved) as SocraticSession : emptySession;
+function readSessionValue<T>(key: string, fallback: T): T {
+  const saved = window.sessionStorage.getItem(key);
+  if (!saved) return fallback;
+  try { return JSON.parse(saved) as T; } catch { return fallback; }
 }
 
 async function loadApprovedChallenge(): Promise<{ context: CodeContext; candidate: ChallengeCandidate }> {
@@ -33,22 +28,35 @@ async function loadApprovedChallenge(): Promise<{ context: CodeContext; candidat
 }
 
 export default function Home() {
-  const [plan, setPlan] = useState<Plan>(initialPlan);
+  const [plan, setPlan] = useState<Plan>(emptyPlan);
+  const [supportLevel, setSupportLevel] = useState<SupportLevel>("guided");
   const [policyMode, setPolicyMode] = useState<PolicyMode>("hints_only");
   const [card, setCard] = useState<CoachingCard | null>(null);
   const [predicted, setPredicted] = useState<string[]>([]);
   const [predictionCorrect, setPredictionCorrect] = useState<boolean | null>(null);
-  const [session, setSession] = useState<SocraticSession>(initialSession);
+  const [session, setSession] = useState<SocraticSession>(emptySession);
   const [guidance, setGuidance] = useState<SocraticResponse | null>(null);
   const [evidence, setEvidence] = useState<EvidenceResponse | null>(null);
   const [codeContext, setCodeContext] = useState<CodeContext | null>(null);
   const [candidate, setCandidate] = useState<ChallengeCandidate | null>(null);
   const [contextError, setContextError] = useState<string | null>(null);
   const [error, setError] = useState("");
+  const [sessionHydrated, setSessionHydrated] = useState(false);
   const latestContextRequest = useRef(0);
 
-  useEffect(() => { sessionStorage.setItem("evidence-engine-plan", JSON.stringify(plan)); }, [plan]);
-  useEffect(() => { sessionStorage.setItem("evidence-engine-socratic-session", JSON.stringify(session)); }, [session]);
+  useEffect(() => {
+    const frame = window.requestAnimationFrame(() => {
+      setPlan(readSessionValue("evidence-engine-plan", emptyPlan));
+      setSession(readSessionValue("evidence-engine-socratic-session", emptySession));
+      const savedSupportLevel = sessionStorage.getItem("evidence-engine-support-level");
+      if (savedSupportLevel === "supported" || savedSupportLevel === "independent") setSupportLevel(savedSupportLevel);
+      setSessionHydrated(true);
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, []);
+  useEffect(() => { if (sessionHydrated) sessionStorage.setItem("evidence-engine-plan", JSON.stringify(plan)); }, [plan, sessionHydrated]);
+  useEffect(() => { if (sessionHydrated) sessionStorage.setItem("evidence-engine-support-level", supportLevel); }, [supportLevel, sessionHydrated]);
+  useEffect(() => { if (sessionHydrated) sessionStorage.setItem("evidence-engine-socratic-session", JSON.stringify(session)); }, [session, sessionHydrated]);
   const loadLatestChallengeContext = useCallback((requestId: number) => {
     void loadApprovedChallenge()
       .then(({ context, candidate }) => {
@@ -119,7 +127,7 @@ export default function Home() {
     {error && <p role="alert" className="alert">{error}</p>}
     <div className="workspace"><div className="primary-column">
       <ChallengeContext context={codeContext} candidate={candidate} error={contextError} onRetry={retryChallengeContext} />
-      <PlanCommitment plan={plan} onChange={setPlan} onSubmit={commitPlan} complete={planComplete} />
+      <PlanCommitment plan={plan} onChange={setPlan} onSubmit={commitPlan} complete={planComplete} supportLevel={supportLevel} onSupportChange={setSupportLevel} onUseStarterPlan={() => setPlan(guidedStarterPlan)} />
       {card && <section className="coach-card"><span className="eyebrow">Assess</span><h2>{card.title}</h2><p>{card.misconception}</p><strong>{card.corrective_question}</strong>{card.hint && <p className="hint">Hint: {card.hint}</p>}</section>}
       <GraphLab predicted={predicted} onToggle={(node) => setPredicted((current) => current.includes(node) ? current.filter((item) => item !== node) : [...current, node])} revealed={predictionCorrect !== null} correct={predictionCorrect ?? undefined} />
       {card && predictionCorrect === null && <button className="primary reveal" disabled={predicted.length === 0} onClick={revealPrediction}>Commit prediction & reveal state</button>}
