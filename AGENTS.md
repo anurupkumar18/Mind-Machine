@@ -11,7 +11,7 @@ Do not load every memory file. The normal context budget is the index, at most t
 
 ## Product invariants
 
-- Accept public or synthetic material only. Never add student records, private repositories, credentials, names, IDs, or emails.
+- Accept public or synthetic material by default. A learner may explicitly authorize a local workspace for a session, but its contents must remain local and unpersisted; exclude credentials, private keys, and detected sensitive content. Never add student records, names, IDs, emails, or repository upload/sync without its separately implemented security controls.
 - Keep challenge selection, deterministic evidence generation, and learning interpretation separate.
 - Never make a mastery percentage or let a model determine pass/fail.
 - Execute only canonical, allowlisted fixture variants. Never execute user-provided code.
@@ -24,4 +24,3 @@ Do not load every memory file. The normal context budget is the index, at most t
 - Update a semantic or long-term memory record only through a reviewed PR. Add a compact episodic handoff when a task changes the next contributor's context.
 - Run the narrowest relevant check before committing; run `make check` before merge.
 - Report changed files, checks, evidence, risks, and next action. Never record private prompts or raw chain-of-thought in memory.
-

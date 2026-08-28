@@ -1,7 +1,9 @@
-# V2 Codex plugin preview
+# Codex plugin foundation
 
-`evidence-engine-tutor` moves codebase onboarding into Codex while preserving
-the Evidence Engine's safety boundary.
+`evidence-engine-tutor` began as consent-first codebase onboarding. It now has
+a local collaborative feature-delivery foundation that keeps the earlier
+source-map modes available while introducing explicit guidance modes and action
+approvals. The full contract is in `docs/LIVE_WORKSPACE_CONTRACT.md`.
 
 ## Slice 1: consent-first entry
 
@@ -12,10 +14,10 @@ commands, edit a project, add persistence, or produce a score.
 
 ## Slice 2: read-only source map
 
-After an exact `yes` in the current conversation, the bundled mapper reads only
-JavaScript, TypeScript, Python, and nested `package.json`/`pyproject.toml`
-files. It returns paths, symbol line anchors, imports, entry-point candidates,
-and limitations.
+After an exact `yes` in the current conversation, the bundled mapper reads
+JavaScript, TypeScript, Python, Java, Kotlin, and nested
+`package.json`/`pyproject.toml` files. It returns paths, symbol line anchors,
+imports, entry-point candidates, and limitations.
 The mapper does not import or execute project code, use project commands, or
 write into the mapped workspace.
 
@@ -32,7 +34,29 @@ The personal marketplace entry resolves to `~/plugins/evidence-engine-tutor`,
 which is a local symlink to this repository's version-controlled plugin source.
 This keeps manual preview installation separate from public distribution.
 
+## Feature-delivery foundation
+
+The new `feature-delivery` skill starts with the same exact session consent,
+then offers four visible modes:
+
+- **Observe:** read and explain only.
+- **Guide:** read, explain, and propose.
+- **Pair:** propose a shared change while the action layer remains unavailable.
+- **Delegate:** propose a delegated plan while the action layer remains unavailable.
+
+The local `workbench_snapshot.py` utility builds the initial structured
+context: mapped files, candidate call path, supported adapters, approval rules,
+and an explicit statement that no diff or tests have been collected. It never
+executes project code, edits a workspace, calls a network service, or stores
+data.
+
+Writes, commands, network actions, and future sync are unavailable in this
+foundation. Their future MCP action layer must provide a visible preview and a
+mechanically bound class-level approval. Deployment remains plan-and-preview
+only.
+
 ## Next slice
 
-After manual feedback, add a first source-anchored micro-exploration flow
-without changing the read-only boundary.
+Connect the workbench snapshot to an MCP tool and UI, then implement the first
+approved TypeScript feature-delivery path: scoped plan, diff preview, command
+preview, observed test output, and review handoff.

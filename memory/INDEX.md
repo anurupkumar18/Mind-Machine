@@ -15,5 +15,4 @@ Load this index, the relevant semantic records, and one current episodic handoff
 
 ## Current handoff
 
-- `episodic/0001-foundation.md`
-
+- `episodic/0013-live-workspace-foundation.md`

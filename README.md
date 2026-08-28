@@ -6,10 +6,11 @@ An evidence-backed graph-traversal learning workspace. Learners commit to a plan
 
 The standalone app remains the deterministic Evidence Engine demo. The primary
 V2 learner experience is now the private `evidence-engine-tutor` Codex plugin.
-Its second preview is consent-first and can create a bounded source map for
-TypeScript, JavaScript, and Python only after an exact in-conversation `yes`.
-It never executes project code, runs project commands, edits files, persists
-learner data, adds telemetry, scores, or makes pass/fail decisions. See
+Its second preview is consent-first and can create a bounded local source map
+for TypeScript, JavaScript, Python, Java, and Kotlin only after an exact
+in-conversation `yes`. It excludes detected sensitive content and never
+executes project code, runs project commands, edits files, persists learner
+data, adds telemetry, scores, or makes pass/fail decisions. See
 `plugins/evidence-engine-tutor/README.md` for the local preview rehearsal.
 
 Learners can choose guided, supported, or independent planning prompts. The support level changes only the amount of explanation and optional editable starter plan; it never changes deterministic evidence or creates a mastery score.

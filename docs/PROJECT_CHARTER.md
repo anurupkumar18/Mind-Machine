@@ -2,21 +2,53 @@
 
 ## Thesis
 
-The Evidence Engine verifies whether a learner can reason about and repair AI-assisted code. It is not a generic tutor, a grading system, or a mastery estimator.
+Evidence Engine is a collaborative AI-coding environment. It helps a learner
+and an agent understand project context, define a feature, make and verify
+changes, and explain the evidence behind those changes. It is not a grading
+system or a mastery estimator.
 
-## Evidence loop
+## Product surfaces
 
-`objective/policy -> plan commitment -> external mental model -> prediction -> controlled perturbation -> diagnosis/repair -> deterministic evidence -> targeted retry`
+- **Codex plugin:** the primary live-workspace surface. The shipped foundation
+  presents consented, local, read-only context and planning; its future MCP
+  workbench will add policy-enforced actions.
+- **Hosted portal:** the future opt-in archive and dashboard surface. It must
+  never become an unconsented project-indexing service.
+- **Fixture lab:** a deterministic public/synthetic evaluation testbed that
+  remains separate from a learner's live workspace.
 
-## MVP boundary
+## Live-workspace boundary
 
-The hosted MVP accepts a public prompt and uses one synthetic Python graph fixture. It has no login, persistence, Canvas/GitHub integration, repository upload, arbitrary code execution, or model API.
+Workspace access is explicit and scoped to the current Codex session. The
+shipped foundation reads selected local source after consent and excludes
+detected sensitive content; it cannot write, execute project commands, use the
+network, or sync. A future MCP policy layer must bind every write, command,
+network, and sync action to a visible class-level approval with a diff,
+command, or data preview. The plugin must say which guidance mode is active
+and what that mode currently allows before it takes an action.
 
-Phase 2 exposes only an allowlisted, synthetic public-code fixture through `CodeContext`; arbitrary URLs and user repositories remain rejected in the hosted product. The private Codex V2 preview is a separate, explicit-consent local adapter: it may read only the authorized open workspace to produce a bounded source map, and may never upload it through an app-owned service, execute project code, or persist learner data.
+The first local workflow may map and explain TypeScript, Python, Java, and
+Kotlin source. Unsupported languages remain generic read-only context until a
+tested adapter exists. Deployment stays plan-and-preview only: the learner
+executes external deployment themselves.
+
+## Privacy and learning records
+
+Sync is absent by default. A future opted-in archive requires GitHub OAuth,
+client-side end-to-end encryption, a user-held recovery phrase, secret
+scanning that blocks unsafe uploads, retention chosen by the learner, export,
+and permanent deletion. The service must not be able to recover archive keys.
 
 ## Architecture
 
-- **Selection:** curated challenge templates now; a provider-neutral candidate interface later.
-- **Evidence:** canonical Python variants and tests, never an LLM grade.
-- **Interpretation:** qualitative, event-level evidence only.
-- **Coaching:** fixture-defined Socratic runbooks may guide a learner through evidence, but never supply a repair implementation or determine pass/fail.
+- **Context:** local adapters build inspectable symbol, import, and entry-point
+  facts for the authorized workspace.
+- **Workflow:** skills route a feature through requirements, planning,
+  implementation, tests, review, deployment preview, and reflection.
+- **Approvals:** the current skills describe action boundaries; a future local
+  policy layer must mechanically gate read, write, command, network, and sync
+  action classes.
+- **Evidence:** canonical fixture evidence and live-workspace verification
+  evidence remain provenance-labelled and separate from interpretation.
+- **Interpretation:** may organize observations and next actions, but never
+  determine learner pass/fail or mastery.
