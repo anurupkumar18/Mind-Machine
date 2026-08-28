@@ -29,6 +29,28 @@ def validate(path: Path) -> list[str]:
     return errors
 
 
+def check_current_handoff_pointer() -> list[str]:
+    """The INDEX's 'Current handoff' pointer must name the latest episodic file.
+
+    Prevents the exact drift an earlier audit found: the pointer had gone stale
+    by 11 records with nothing catching it. 'Latest' is by filename sort, which
+    matches the NNNN- numeric prefix convention used under memory/episodic/.
+    """
+    index_path = MEMORY / "INDEX.md"
+    episodic_files = sorted((MEMORY / "episodic").glob("*.md"))
+    if not index_path.exists() or not episodic_files:
+        return []
+    latest = episodic_files[-1].name
+    index_text = index_path.read_text(encoding="utf-8")
+    if latest not in index_text:
+        return [
+            f"{index_path.relative_to(ROOT)} 'Current handoff' pointer is stale: "
+            f"expected it to reference {latest} (the latest file in memory/episodic/), "
+            "but it doesn't. Update the pointer and the current-state summary block."
+        ]
+    return []
+
+
 def build_index(files: list[Path]) -> None:
     CACHE.parent.mkdir(parents=True, exist_ok=True)
     with sqlite3.connect(CACHE) as connection:
@@ -43,6 +65,7 @@ def build_index(files: list[Path]) -> None:
 def main() -> int:
     files = sorted(MEMORY.rglob("*.md"))
     errors = [error for path in files for error in validate(path)]
+    errors.extend(check_current_handoff_pointer())
     if errors:
         print("\n".join(errors))
         return 1
