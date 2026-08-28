@@ -1,20 +1,21 @@
 {
   "name": "evidence-engine-tutor",
-  "version": "0.1.0+codex.20260828045252",
-  "description": "Consent-first, read-only codebase onboarding in Codex.",
+  "version": "0.1.0+codex.20260828143143",
+  "description": "Consent-based local project mapping and feature planning in Codex.",
   "author": {
     "name": "Evidence Engine contributors"
   },
   "skills": "./skills/",
   "interface": {
     "displayName": "Evidence Engine Tutor",
-    "shortDescription": "Read-only, consent-first codebase onboarding.",
-    "longDescription": "Guide a learner through a local codebase without editing files, running commands, persistence, or scoring.",
+    "shortDescription": "Map and plan a local project with visible guidance modes.",
+    "longDescription": "Guide a learner through a consented local workspace with read-only context and feature planning. Editing, commands, sync, and network actions are not included in this foundation.",
     "developerName": "Evidence Engine contributors",
     "category": "Productivity",
     "capabilities": [
-      "Interactive"
+      "Interactive",
+      "Local workspace"
     ],
-    "defaultPrompt": "Start a read-only codebase onboarding session."
+    "defaultPrompt": "Start a collaborative feature-delivery session for this workspace."
   }
 }

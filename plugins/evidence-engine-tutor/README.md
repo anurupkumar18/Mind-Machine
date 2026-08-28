@@ -1,9 +1,11 @@
 # Evidence Engine Tutor
 
-Private Codex-plugin preview for consent-first codebase onboarding.
+Private Codex-plugin foundation for consented codebase onboarding and
+collaborative feature delivery.
 
 After explicit in-conversation consent, this preview runs its own bounded
-mapper over JavaScript, TypeScript, Python, `package.json`, and `pyproject.toml`.
+mapper over JavaScript, TypeScript, Python, Java, Kotlin, `package.json`, and
+`pyproject.toml`.
 It never imports or executes project code, runs project commands, edits files,
 persists learner data, adds telemetry, scores, or determines pass/fail.
 
@@ -25,5 +27,15 @@ persists learner data, adds telemetry, scores, or determines pass/fail.
    plugin restates the learner's answer as a prediction rather than confirming
    it or claiming runtime behavior.
 
-The next slice will add a first source-anchored micro-exploration flow after
-manual feedback on the three modes.
+## Collaborative feature-delivery foundation
+
+The `feature-delivery` skill introduces a live-workspace workflow after an
+exact in-conversation `yes`. The learner selects Observe, Guide, Pair, or
+Delegate mode. The bundled workbench snapshot maps TypeScript, Python, Java,
+and Kotlin source text and metadata, then returns entry points, imports,
+symbols, approval requirements, and explicit limitations.
+
+This foundation remains local and read-only until a later action is separately
+approved. It does not yet edit a workspace, run project commands, collect a
+diff, call a network service, authenticate a user, or persist/sync learning
+records. See `docs/LIVE_WORKSPACE_CONTRACT.md` for the product contract.

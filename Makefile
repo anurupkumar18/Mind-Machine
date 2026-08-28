@@ -1,7 +1,7 @@
 API_DIR := apps/api
 WEB_DIR := apps/web
 
-.PHONY: setup dev test lint typecheck check smoke demo memory-check
+.PHONY: setup dev test test-e2e lint typecheck check smoke demo memory-check
 
 setup:
 	cd $(API_DIR) && uv sync --dev
@@ -13,6 +13,9 @@ dev:
 test:
 	cd $(API_DIR) && uv run pytest
 	cd $(WEB_DIR) && pnpm test
+
+test-e2e:
+	cd $(WEB_DIR) && pnpm test:e2e
 
 lint:
 	cd $(API_DIR) && uv run ruff check .
@@ -28,7 +31,7 @@ memory-check:
 smoke:
 	cd $(API_DIR) && uv run pytest tests/test_api.py -q
 
-check: memory-check lint typecheck test smoke
+check: memory-check lint typecheck test test-e2e smoke
 
 demo: check
 	@echo "Demo ready: start API and web, then follow docs/DEMO_RUNBOOK.md."
