@@ -17,19 +17,23 @@ const candidate = [{
 
 test("retries the fixed approved challenge context after a load failure", async ({ page }) => {
   let contextAttempts = 0;
+  let contextAvailable = false;
   await page.route("http://localhost:8000/code-context/public-graph-traversal", async (route) => {
     contextAttempts += 1;
-    if (contextAttempts === 1) await route.abort("failed");
+    if (!contextAvailable) await route.abort("failed");
     else await route.fulfill({ contentType: "application/json", json: context });
   });
   await page.route("http://localhost:8000/challenge-candidates/public-graph-traversal", (route) => route.fulfill({ contentType: "application/json", json: candidate }));
 
   await page.goto("/");
+  await expect.poll(() => contextAttempts).toBeGreaterThan(0);
   await expect(page.getByRole("heading", { name: "Challenge context unavailable" })).toBeVisible();
+  const attemptsBeforeRetry = contextAttempts;
+  contextAvailable = true;
   await page.getByRole("button", { name: "Retry approved context" }).click();
 
   await expect(page.getByRole("heading", { name: "Challenge context" })).toBeVisible();
   await expect(page.getByText("bfs.py", { exact: true })).toBeVisible();
   await expect(page.getByText("TRAVERSAL-INVARIANT-02", { exact: true })).toBeVisible();
-  expect(contextAttempts).toBeGreaterThanOrEqual(2);
+  expect(contextAttempts).toBeGreaterThan(attemptsBeforeRetry);
 });
