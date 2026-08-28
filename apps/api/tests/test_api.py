@@ -15,15 +15,24 @@ PLAN = {
 
 
 def test_full_evidence_api_path() -> None:
-    checkpoint = client.post("/checkpoint", json={"policy_mode": "bounded_snippets", "plan": PLAN})
+    checkpoint = client.post("/checkpoint", json={"policy_mode": "hints_only", "plan": PLAN})
     assert checkpoint.status_code == 200
-    assert checkpoint.json()["card"]["snippet"] is not None
+    assert checkpoint.json()["card"]["hint"] is not None
+    assert "snippet" not in checkpoint.json()["card"]
 
     prediction = client.post("/challenge/predict", json={"predicted_frontier": ["B", "C"]})
     assert prediction.status_code == 200
     assert prediction.json()["correct"] is True
 
-    repair = client.post("/challenge/repair", json={"repair_id": "mark_visited_on_enqueue"})
+    diagnosis = client.post(
+        "/challenge/diagnose",
+        json={"diagnosis": "late_frontier_recognition", "attempt": 1},
+    )
+    assert diagnosis.status_code == 200
+    assert diagnosis.json()["accepted"] is True
+    assert diagnosis.json()["stage"] == "confirm"
+
+    repair = client.post("/challenge/repair", json={"repair_timing": "frontier_entry"})
     assert repair.status_code == 200
     assert repair.json()["tests_passed"] is True
 
@@ -41,8 +50,18 @@ def test_full_evidence_api_path() -> None:
     assert evidence.json()["status"] == "Demonstrated"
 
 
-def test_repair_rejects_non_allowlisted_input() -> None:
-    response = client.post("/challenge/repair", json={"repair_id": "arbitrary-code"})
+def test_diagnosis_escalates_without_leaking_a_repair() -> None:
+    first = client.post("/challenge/diagnose", json={"diagnosis": "wrong_queue_order", "attempt": 1})
+    second = client.post("/challenge/diagnose", json={"diagnosis": "wrong_queue_order", "attempt": 2})
+    third = client.post("/challenge/diagnose", json={"diagnosis": "wrong_queue_order", "attempt": 3})
+    assert first.json()["stage"] == "guide"
+    assert second.json()["scaffold_level"] == 2
+    assert third.json()["scaffold_level"] == 3
+    assert "visited.add" not in third.json()["question"]
+
+
+def test_confirmation_rejects_non_allowlisted_timing() -> None:
+    response = client.post("/challenge/repair", json={"repair_timing": "traversal_end"})
     assert response.status_code == 400
 
 

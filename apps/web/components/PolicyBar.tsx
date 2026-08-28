@@ -2,8 +2,7 @@ import type { PolicyMode } from "../lib/types";
 
 const labels: Record<PolicyMode, string> = {
   no_code_help: "No code help",
-  hints_only: "Hints only",
-  bounded_snippets: "Bounded snippets"
+  hints_only: "Hints only"
 };
 
 export function PolicyBar({ policyMode, onChange }: { policyMode: PolicyMode; onChange: (mode: PolicyMode) => void }) {
@@ -14,4 +13,3 @@ export function PolicyBar({ policyMode, onChange }: { policyMode: PolicyMode; on
     </div>
   </section>;
 }
-

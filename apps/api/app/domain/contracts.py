@@ -8,7 +8,6 @@ from pydantic import BaseModel, Field, field_validator
 class PolicyMode(StrEnum):
     NO_CODE_HELP = "no_code_help"
     HINTS_ONLY = "hints_only"
-    BOUNDED_SNIPPETS = "bounded_snippets"
 
 
 class PlanCommitment(BaseModel):
@@ -31,7 +30,6 @@ class CoachingCard(BaseModel):
     misconception: str
     corrective_question: str
     hint: str | None = None
-    snippet: str | None = None
 
 
 class CheckpointResponse(BaseModel):
@@ -55,15 +53,36 @@ class PredictionResponse(BaseModel):
     evidence_type: str = "frontier_prediction"
 
 
-class RepairRequest(BaseModel):
-    repair_id: str
-
-
 class RepairResponse(BaseModel):
     accepted: bool
     tests_passed: bool
     result: str
     evidence_type: str = "mutation_repair"
+
+
+class SocraticStage(StrEnum):
+    READ = "read"
+    ASSESS = "assess"
+    GUIDE = "guide"
+    ADAPT = "adapt"
+    CONFIRM = "confirm"
+
+
+class DiagnosisRequest(BaseModel):
+    diagnosis: str
+    attempt: int = Field(ge=1, le=3)
+
+
+class SocraticResponse(BaseModel):
+    accepted: bool
+    stage: SocraticStage
+    scaffold_level: int
+    observation: str
+    question: str
+
+
+class ConfirmationRequest(BaseModel):
+    repair_timing: str
 
 
 class EvidenceRequest(BaseModel):

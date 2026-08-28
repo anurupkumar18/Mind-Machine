@@ -1,4 +1,4 @@
-export type PolicyMode = "no_code_help" | "hints_only" | "bounded_snippets";
+export type PolicyMode = "no_code_help" | "hints_only";
 
 export type Plan = {
   objective: string;
@@ -15,7 +15,24 @@ export type CoachingCard = {
   misconception: string;
   corrective_question: string;
   hint?: string | null;
-  snippet?: string | null;
+};
+
+export type SocraticStage = "read" | "assess" | "guide" | "adapt" | "confirm";
+
+export type SocraticResponse = {
+  accepted: boolean;
+  stage: SocraticStage;
+  scaffold_level: number;
+  observation: string;
+  question: string;
+};
+
+export type SocraticSession = {
+  phase: SocraticStage;
+  diagnosis_attempts: number;
+  diagnosis_accepted: boolean;
+  repair_passed: boolean;
+  retry_scheduled: boolean;
 };
 
 export type EvidenceResponse = {

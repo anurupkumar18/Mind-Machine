@@ -10,17 +10,20 @@ from app.domain.contracts import (
     CheckpointRequest,
     CheckpointResponse,
     CodeContext,
+    ConfirmationRequest,
+    DiagnosisRequest,
     EvidenceRequest,
     EvidenceResponse,
     PredictionRequest,
     PredictionResponse,
-    RepairRequest,
     RepairResponse,
+    SocraticResponse,
 )
 from app.domain.interpretation import interpret_evidence
 from app.domain.policy import select_coaching_card
 from app.domain.repo_context import approved_context, curated_candidate
-from app.domain.runtime import allowlisted_repair_passes, canonical_next_frontier
+from app.domain.runtime import canonical_next_frontier, canonical_repair_confirmed
+from app.domain.socratic import diagnose
 
 app = FastAPI(title="Evidence Engine API", version="0.1.0")
 allowed_origins = os.getenv("ALLOWED_ORIGINS", "http://localhost:3000,http://127.0.0.1:3000").split(",")
@@ -69,15 +72,20 @@ def predict(request: PredictionRequest) -> PredictionResponse:
 
 
 @app.post("/challenge/repair", response_model=RepairResponse)
-def repair(request: RepairRequest) -> RepairResponse:
-    if request.repair_id != "mark_visited_on_enqueue":
-        raise HTTPException(status_code=400, detail="Repair is not allowlisted for this fixture.")
-    passed = allowlisted_repair_passes(request.repair_id)
+def repair(request: ConfirmationRequest) -> RepairResponse:
+    passed = canonical_repair_confirmed(request.repair_timing)
+    if not passed:
+        raise HTTPException(status_code=400, detail="Confirmation does not preserve the fixture invariant.")
     return RepairResponse(
         accepted=True,
         tests_passed=passed,
-        result="Canonical traversal tests pass." if passed else "Canonical traversal tests failed.",
+        result="The canonical traversal tests pass after the confirmed conceptual repair.",
     )
+
+
+@app.post("/challenge/diagnose", response_model=SocraticResponse)
+def diagnosis(request: DiagnosisRequest) -> SocraticResponse:
+    return diagnose(request)
 
 
 @app.post("/evidence", response_model=EvidenceResponse)

@@ -49,3 +49,11 @@ def allowlisted_repair_passes(repair_id: str) -> bool:
         and visited == cast(list[str], fixture_value("expected_first_visited"))
         and mutation_creates_duplicate_frontier()
     )
+
+
+def canonical_repair_confirmed(repair_timing: str) -> bool:
+    """Confirm the learner's conceptual repair before running the fixture variant."""
+    runbook = cast(dict[str, object], fixture_value("diagnostic_runbook"))
+    confirmation = cast(dict[str, str], runbook["confirmation"])
+    mutation = cast(dict[str, str], fixture_value("mutation"))
+    return repair_timing == confirmation["accepted_timing"] and allowlisted_repair_passes(mutation["allowed_repair"])

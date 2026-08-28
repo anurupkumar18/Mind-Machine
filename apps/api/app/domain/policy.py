@@ -19,5 +19,4 @@ def select_coaching_card(plan: PlanCommitment, policy: PolicyMode) -> CoachingCa
         misconception=cast(str, selected["misconception"]),
         corrective_question=cast(str, selected["corrective_question"]),
         hint=None if policy == PolicyMode.NO_CODE_HELP else cast(str, selected["hint"]),
-        snippet=cast(str, selected["snippet"]) if policy == PolicyMode.BOUNDED_SNIPPETS else None,
     )

@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { getApprovedChallengeCandidates, getApprovedCodeContext } from "../lib/api";
+import { EvidenceServiceError, getApprovedChallengeCandidates, getApprovedCodeContext, submitConfirmation } from "../lib/api";
 
 const context = {
   repository_id: "public-graph-traversal",
@@ -30,5 +30,17 @@ describe("approved challenge context contract", () => {
 
     expect(fetchMock).toHaveBeenNthCalledWith(1, "http://localhost:8000/code-context/public-graph-traversal");
     expect(fetchMock).toHaveBeenNthCalledWith(2, "http://localhost:8000/challenge-candidates/public-graph-traversal");
+  });
+
+  it("preserves the expected confirmation rejection status for instructional recovery", async () => {
+    vi.spyOn(globalThis, "fetch").mockResolvedValueOnce(
+      new Response(JSON.stringify({ detail: "Confirmation does not preserve the fixture invariant." }), { status: 400 })
+    );
+
+    await expect(submitConfirmation("frontier_exit")).rejects.toMatchObject({
+      name: "EvidenceServiceError",
+      message: "The evidence service could not verify this step.",
+      status: 400
+    } satisfies Partial<EvidenceServiceError>);
   });
 });
