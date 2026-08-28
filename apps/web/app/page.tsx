@@ -14,10 +14,32 @@ const emptyPlan: Plan = { objective: "", strategy: "", representation: "", invar
 const emptySession: SocraticSession = { phase: "read", diagnosis_attempts: 0, diagnosis_accepted: false, repair_passed: false, retry_scheduled: false };
 const guidedStarterPlan: Plan = { objective: "Explain how BFS explores a graph", strategy: "Use a first-in, first-out queue", representation: "A list of each node's neighbors", invariant: "Mark a node before another parent can add it", complexity: "Visit nodes and edges once: O(V + E)", planned_tests: "A graph where two paths reach the same node" };
 
-function readSessionValue<T>(key: string, fallback: T): T {
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null;
+}
+
+function isPlan(value: unknown): value is Plan {
+  return isRecord(value) && ["objective", "strategy", "representation", "invariant", "complexity", "planned_tests"].every((key) => typeof value[key] === "string");
+}
+
+function isSocraticSession(value: unknown): value is SocraticSession {
+  return isRecord(value)
+    && ["read", "assess", "guide", "adapt", "confirm"].includes(String(value.phase))
+    && typeof value.diagnosis_attempts === "number"
+    && typeof value.diagnosis_accepted === "boolean"
+    && typeof value.repair_passed === "boolean"
+    && typeof value.retry_scheduled === "boolean";
+}
+
+function readSessionValue<T>(key: string, fallback: T, isValid: (value: unknown) => value is T): T {
   const saved = window.sessionStorage.getItem(key);
   if (!saved) return fallback;
-  try { return JSON.parse(saved) as T; } catch { return fallback; }
+  try {
+    const parsed: unknown = JSON.parse(saved);
+    return isValid(parsed) ? parsed : fallback;
+  } catch {
+    return fallback;
+  }
 }
 
 async function loadApprovedChallenge(): Promise<{ context: CodeContext; candidate: ChallengeCandidate }> {
@@ -46,8 +68,8 @@ export default function Home() {
 
   useEffect(() => {
     const frame = window.requestAnimationFrame(() => {
-      setPlan(readSessionValue("evidence-engine-plan", emptyPlan));
-      setSession(readSessionValue("evidence-engine-socratic-session", emptySession));
+      setPlan(readSessionValue("evidence-engine-plan", emptyPlan, isPlan));
+      setSession(readSessionValue("evidence-engine-socratic-session", emptySession, isSocraticSession));
       const savedSupportLevel = sessionStorage.getItem("evidence-engine-support-level");
       if (savedSupportLevel === "supported" || savedSupportLevel === "independent") setSupportLevel(savedSupportLevel);
       setSessionHydrated(true);

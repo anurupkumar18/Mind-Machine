@@ -38,6 +38,20 @@ test("retries the fixed approved challenge context after a load failure", async 
   expect(contextAttempts).toBeGreaterThan(attemptsBeforeRetry);
 });
 
+test("recovers from malformed saved browser state", async ({ page }) => {
+  await page.addInitScript(() => {
+    sessionStorage.setItem("evidence-engine-plan", JSON.stringify({ objective: 7 }));
+    sessionStorage.setItem("evidence-engine-socratic-session", "not-json");
+  });
+  await page.route("http://localhost:8000/code-context/public-graph-traversal", (route) => route.fulfill({ contentType: "application/json", json: context }));
+  await page.route("http://localhost:8000/challenge-candidates/public-graph-traversal", (route) => route.fulfill({ contentType: "application/json", json: candidate }));
+
+  await page.goto("/");
+
+  await expect(page.getByRole("heading", { name: "Challenge context" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Load an editable starter plan" })).toBeVisible();
+});
+
 test("guides a diagnosis through conceptual confirmation without exposing repair code", async ({ page }) => {
   await page.route("http://localhost:8000/code-context/public-graph-traversal", (route) => route.fulfill({ contentType: "application/json", json: context }));
   await page.route("http://localhost:8000/challenge-candidates/public-graph-traversal", (route) => route.fulfill({ contentType: "application/json", json: candidate }));
@@ -50,9 +64,9 @@ test("guides a diagnosis through conceptual confirmation without exposing repair
   } }));
   await page.route("http://localhost:8000/challenge/diagnose", async (route) => {
     const request = route.request().postDataJSON() as { diagnosis: string };
-    const accepted = request.diagnosis === "mark_on_enqueue";
+    const accepted = request.diagnosis === "late_frontier_recognition";
     await route.fulfill({ contentType: "application/json", json: accepted
-      ? { accepted: true, stage: "confirm", scaffold_level: 0, observation: "D is discovered from two parents.", question: "When is discovery recorded?" }
+      ? { accepted: true, stage: "confirm", scaffold_level: 0, observation: "D is discovered from two parents.", question: "At which abstract lifecycle event must the traversal record a node to preserve the invariant?" }
       : { accepted: false, stage: "guide", scaffold_level: 1, observation: "D can enter the frontier twice.", question: "Which event records the first discovery?" }
     });
   });
@@ -64,30 +78,32 @@ test("guides a diagnosis through conceptual confirmation without exposing repair
     }
     await route.fulfill({ status: 400, contentType: "application/json", json: { detail: "Confirmation does not preserve the fixture invariant." } });
   });
+  await page.route("http://localhost:8000/evidence", async (route) => {
+    const request = route.request().postDataJSON() as { prediction_correct: boolean; invariant_preserved: boolean; repair_passed: boolean };
+    expect(request).toMatchObject({ prediction_correct: true, invariant_preserved: true, repair_passed: true });
+    await route.fulfill({ contentType: "application/json", json: {
+      status: "Demonstrated",
+      items: [{ label: "Repaired controlled mutation", state: "demonstrated", detail: "Observed through a deterministic fixture." }],
+      next_action: "Try a transfer graph with a different branching pattern."
+    } });
+  });
 
   await page.goto("/");
-  const plan = {
-    "Learning objective": "Explain BFS traversal invariants",
-    "Approach": "Use a FIFO queue for each level",
-    "Graph representation": "Adjacency list",
-    "Invariant": "Each queued node is already visited",
-    "Complexity": "O(V + E)",
-    "Planned tests": "Cycle and converging-parent graph"
-  };
-  for (const [label, value] of Object.entries(plan)) await page.getByLabel(label, { exact: true }).fill(value);
+  await page.getByRole("button", { name: "Load an editable starter plan" }).click();
   await page.getByRole("button", { name: "Use this plan to get coaching" }).click();
   await page.getByRole("button", { name: "B", exact: true }).click();
   await page.getByRole("button", { name: "C", exact: true }).click();
   await page.getByRole("button", { name: "Commit prediction & reveal state" }).click();
 
   await page.getByRole("button", { name: "The traversal recognizes a discovered node too late, allowing another parent to add it first." }).click();
-  await expect(page.getByText("Which event records the first discovery?")).toBeVisible();
-  await page.getByRole("button", { name: "Mark a node when it enters the frontier" }).click();
-  await expect(page.getByText("When is discovery recorded?")).toBeVisible();
+  await expect(page.getByText("At which abstract lifecycle event must the traversal record a node to preserve the invariant?")).toBeVisible();
   await expect(page.getByText("visited.add", { exact: false })).toHaveCount(0);
 
   await page.getByRole("button", { name: "When the node leaves the frontier" }).click();
   await expect(page.locator("p[role=alert]")).toHaveText("Choose the lifecycle event that preserves the invariant.");
   await page.getByRole("button", { name: "When the node enters the frontier" }).click();
   await expect(page.getByText("Canonical traversal tests passed after your conceptual confirmation.")).toBeVisible();
+  await page.getByRole("button", { name: "Generate evidence map" }).click();
+  await expect(page.getByRole("heading", { name: "Graph traversal — Demonstrated" })).toBeVisible();
+  await expect(page.getByText("Try a transfer graph with a different branching pattern.")).toBeVisible();
 });
