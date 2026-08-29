@@ -34,6 +34,20 @@ dead ends, in order:
    Canvas API client against a real Canvas API without any institutional
    dependency. Instructure discontinued that program; signup is closed.
 
+A third path was then checked and closed: Canvas's own official developer
+docs (`developerdocs.instructure.com/services/canvas/oauth2/file.oauth`)
+confirm that OAuth2 developer-key registration — the credential a real,
+per-student-consent integration would actually use, not a personal token —
+is **also admin-only**: "For Canvas Cloud (hosted by Instructure),
+developer keys are issued by the admin of the institution." Same wall as
+path 1, not a way around it. The same docs also state outright that
+"asking any other user to manually generate a token and enter it into your
+application is a violation of Canvas' API Policy" — confirming the plan's
+existing design (real OAuth2 consent per student, never collecting
+personal tokens from users) is the only compliant path, and that every
+route to real Canvas access — this spike's or the eventual product's —
+runs through the same UofU Canvas admin approval.
+
 No PII from the account holder's real UofU Canvas account (name, email,
 other integrations visible on that settings page) is recorded here or
 anywhere else in this repo, per invariant I5.
