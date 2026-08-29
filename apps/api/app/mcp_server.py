@@ -20,12 +20,18 @@ from typing import Any
 
 from mcp.server.mcpserver import MCPServer
 
+from app.domain.canvas_mock import mock_course_context
 from app.domain.challenge_token import InvalidTokenError, issue_token, verify_token
-from app.domain.contracts import DiagnosisRequest
+from app.domain.contracts import CourseTopicsResponse, DiagnosisRequest
 from app.domain.fixtures import fixture_data
 from app.domain.runtime import canonical_next_frontier
 from app.domain.sandbox import execute_repair
 from app.domain.socratic import diagnose
+from app.domain.topic_matching import (
+    NoMatchingChallengeError,
+    match_topics,
+    resolve_challenge_for_topic,
+)
 
 KNOWN_CHALLENGES = {"traversal-invariant-02"}
 
@@ -51,8 +57,42 @@ def _require_challenge_id(challenge_token: str) -> str:
 
 
 @mcp.tool()
-def start_challenge(challenge_id: str) -> dict[str, Any]:
-    """Issue a challenge instance, its token, and starting trace metadata."""
+def list_course_topics() -> dict[str, Any]:
+    """List the (mock) connected course's module/topic titles and which
+    have a matching practice challenge today.
+
+    Backed by fixture data, not a real Canvas connection -- real Canvas
+    access is gated behind confirmed institutional approval (I4) and not
+    yet available. See docs/CANVAS_INTEGRATION.md.
+    """
+    context = mock_course_context()
+    response = CourseTopicsResponse(
+        course_name=context.course_name,
+        syllabus_body=context.syllabus_body,
+        topics=match_topics(context),
+    )
+    payload = response.model_dump()
+    payload["trace"] = {"stage": "planner", "tool": "list_course_topics"}
+    return payload
+
+
+@mcp.tool()
+def start_challenge(challenge_id: str | None = None, topic: str | None = None) -> dict[str, Any]:
+    """Issue a challenge instance, its token, and starting trace metadata.
+
+    Exactly one of challenge_id or topic must be given. topic resolves to
+    a challenge_id via the same keyword-overlap matcher list_course_topics
+    uses (app.domain.topic_matching); see docs/CANVAS_INTEGRATION.md.
+    """
+    if (challenge_id is None) == (topic is None):
+        raise ValueError("Provide exactly one of challenge_id or topic")
+    if topic is not None:
+        try:
+            challenge_id = resolve_challenge_for_topic(topic)
+        except NoMatchingChallengeError as error:
+            raise ValueError(str(error)) from error
+    assert challenge_id is not None
+
     if challenge_id not in KNOWN_CHALLENGES:
         raise ValueError(f"Unknown challenge id: {challenge_id!r}")
 

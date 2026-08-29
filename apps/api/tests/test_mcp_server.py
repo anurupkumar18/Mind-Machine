@@ -67,3 +67,54 @@ async def test_unknown_challenge_id_is_reported_as_tool_error_not_a_crash() -> N
         result = await session.call_tool("start_challenge", {"challenge_id": "does-not-exist"})
 
     assert result.is_error is True
+
+
+async def test_list_course_topics_tool_is_discoverable() -> None:
+    async with connected_client() as session:
+        tools = await session.list_tools()
+
+    names = [tool.name for tool in tools.tools]
+    assert "list_course_topics" in names
+
+
+async def test_list_course_topics_returns_mock_course_with_a_matched_topic() -> None:
+    async with connected_client() as session:
+        result = await session.call_tool("list_course_topics", {})
+
+    assert result.is_error is not True
+    payload = json.loads(result.content[0].text)  # type: ignore[union-attr]
+    assert payload["course_name"]
+    matched = [t for t in payload["topics"] if t["matched_challenge_id"] == "traversal-invariant-02"]
+    assert matched, "expected at least one mock module to match traversal-invariant-02"
+
+
+async def test_start_challenge_accepts_topic_instead_of_challenge_id() -> None:
+    async with connected_client() as session:
+        result = await session.call_tool("start_challenge", {"topic": "graph traversal"})
+
+    assert result.is_error is not True
+    payload = json.loads(result.content[0].text)  # type: ignore[union-attr]
+    assert payload["challenge_id"] == "traversal-invariant-02"
+
+
+async def test_start_challenge_rejects_both_challenge_id_and_topic() -> None:
+    async with connected_client() as session:
+        result = await session.call_tool(
+            "start_challenge", {"challenge_id": "traversal-invariant-02", "topic": "graph traversal"}
+        )
+
+    assert result.is_error is True
+
+
+async def test_start_challenge_rejects_neither_challenge_id_nor_topic() -> None:
+    async with connected_client() as session:
+        result = await session.call_tool("start_challenge", {})
+
+    assert result.is_error is True
+
+
+async def test_start_challenge_rejects_unmatched_topic() -> None:
+    async with connected_client() as session:
+        result = await session.call_tool("start_challenge", {"topic": "dynamic programming"})
+
+    assert result.is_error is True
