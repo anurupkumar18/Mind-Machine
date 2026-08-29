@@ -179,14 +179,14 @@ Spec-first tasks referencing a phase/task ID here; verify SDK/API usage against 
 | R8 | Timeline: ambitious scope kept in full | all | Resequenced risk-first (Phase 1 spikes) so a hard blocker surfaces early | Open — needs team timeline sanity-check |
 | R9 | Agent-generated slop | all | Spec-first tasks, mandatory tests, human review, PR checklist | Process in place |
 | R10 | Sandbox build is real, non-trivial infrastructure | 1, 2 | Phase 1 spike proves the minimal version first; scope to exactly what verification needs | Spike passed (`apps/api/app/domain/sandbox.py`); production-grade container/VM isolation still open for Phase 2 |
-| R11 | UofU workspace admin approval may not be obtainable before the hackathon | 1 | Explicit Phase 1 spike; fallback decided in advance | Open — highest-priority unknown |
+| R11 | UofU workspace admin approval may not be obtainable before the hackathon | 1 | Explicit Phase 1 spike; fallback decided in advance | Open — highest-priority unknown. Candidate contacts and process identified (§9); nobody has reached out yet. Fallback if this doesn't resolve in time: personal ChatGPT/Codex accounts for the demo (OpenAI's separate "Codex for Students" $100-credit program, independent of any UofU approval, is a viable personal-account fallback path — confirmed to exist, not yet tested against this project) |
 
 ---
 
 ## 9. Open Questions for the Team
 
 1. **Sandbox ownership (R10)**: who builds and operates the verification sandbox — skillset, hosting choice, isolation approach need an owner.
-2. **Workspace admin contact (R11)**: does anyone on the team have a relationship with whoever administers UofU's ChatGPT Edu/Codex workspace? Highest-priority unknown — everything downstream assumes it resolves favorably.
+2. **Workspace admin contact (R11)** — candidate contacts identified (public info from `ai.utah.edu/about.php`), not yet reached out to (see `memory/episodic/0018-*.md`): UofU's ChatGPT Edu offering **explicitly includes Codex** (confirmed on `ai.utah.edu/tools/chatgpt/index.php`), and there is a formal review process for a custom tool/GPT not already approved — the **AI Tool Form** (`bit.ly/ai-tools-utah`), reviewed by IT, information security, legal counsel, "and other stakeholders as necessary." The published AI Office Leadership roster's "Technology, Tools, Infrastructure" function (most relevant to installing a custom App/plugin) is Shawn Halladay, Jake Johansen, Jim Livingston, Caprice Post, and Jon Thomas; Callie Reed is the AI Programs Manager and a reasonable single point of contact; Manish Parashar is Chief AI Officer. Someone on the team needs to actually submit the AI Tool Form and/or email one of these contacts — an AI agent submitting a form or sending an email on the team's behalf isn't appropriate here, this needs a real person's name attached to the ask.
 3. **Canvas institutional contact (R5)**: still needs a named owner.
 4. **Timeline sanity-check (R8)**: does the team agree Phase 1's four spikes should gate further work, even at the cost of less calendar time for polish later?
 5. **Pilot participants (Phase 9)**: who are the 5-10 students/teammates, and is there lead time to get delayed-retention data, or does that compress to same-session-only measurement?
