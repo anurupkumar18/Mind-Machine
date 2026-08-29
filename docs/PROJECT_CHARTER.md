@@ -2,7 +2,7 @@
 
 ## Thesis
 
-The Evidence Engine verifies whether a learner can reason about and repair code. It is not a generic tutor, a grading system, or a mastery estimator.
+Evidence Engine gives learners low-stakes code-repair practice and returns reproducible evidence from tests executed in a controlled verifier Evidence Engine itself runs. The host model may coach and interpret results, but it never creates the authoritative verdict. It is not a generic tutor, a grading system, or a mastery estimator.
 
 ## Non-negotiable invariants
 
@@ -10,13 +10,14 @@ Every design decision and every PR must satisfy all of these. See `docs/IMPLEMEN
 
 | # | Invariant |
 |---|---|
-| I1 | Never reads, modifies, executes, or operates on a student's actual coursework, homework, or exam submission. All practice content is curated or procedurally generated in our own safe space. |
-| I2 | No model ever decides pass/fail or produces a mastery score. Evidence always comes from a real, executed, deterministic verification. |
-| I3 | No LLM call is ever made on a student's behalf by our own infrastructure. The host platform's (ChatGPT's/Codex's) own model does all reasoning, under the student's existing seat. |
-| I4 | Canvas access is read-only, student-consented, and scoped to course materials — never gradebook, submissions, or another student's data. Enforced twice: Canvas's own scoped developer-key restriction, and our own code refusing those endpoints regardless. |
-| I5 | No server-side learner data store; no login; no PII. Skill-state/misconception data lives client-side only. |
-| I6 | The non-evaluative guardrail is structural, not just promised: the diagnosis-coaching tool is never given the verdict as part of its own schema, so it cannot leak one. |
-| I7 | Any new tool exposed to the host model must extend the shared non-evaluative guardrail test suite before merge. |
+| I1 | Never reads, modifies, executes, or operates on a student's actual coursework, homework, exam, quiz, or discussion content. All practice content is curated, procedurally generated, or drawn from a vetted reference-implementation catalog — never a student's real assignment. |
+| I2 | No model ever decides pass/fail or produces a mastery score. Evidence always comes from tests executed inside Evidence Engine's own controlled, isolated sandbox — never self-reported by the host platform. |
+| I3 | We never call an LLM on a student's behalf. The host platform's own model does the conversational reasoning under the student's existing seat, so we carry no per-student LLM inference cost. We do host and pay for the verification sandbox (real compute) — that's execution, not LLM inference. |
+| I4 | Canvas access is read-only, student-consented, narrowed to syllabus and module/topic titles by default, and gated behind confirmed institutional data-policy approval — no real Canvas content is transmitted to the host platform, our server, or logs until that approval is documented. Assignment, quiz, discussion, and submission content is excluded from the allowlist entirely. |
+| I5 | Evidence Engine has no separate account, login, or server-side learner data store. Skill-selection state lives client-side only. This doesn't eliminate the logins the host platforms themselves require (UofU SSO, Canvas OAuth) — those are pre-existing institutional logins, not something we add. |
+| I6 | The non-evaluative guardrail works by never giving the coaching model access to hidden tests or the canonical repair at any point before the student submits a repair attempt — not by omitting a field from one tool's schema. Verified against a fixed behavioral eval set testing for answer-leakage and over-helping. |
+| I7 | Any new tool exposed to the host model must extend the shared guardrail test suite before merge, including the answer-leakage/over-helping behavioral eval set. |
+| I8 | Every evidence record is produced by Evidence Engine's own sandboxed execution and cryptographically signed — includes challenge ID + version, base-code hash, submitted-repair hash, test-suite/oracle version, seed, runtime digest, exit status, and per-property results. The host model can narrate this record; it cannot alter or fabricate it. |
 
 ## Evidence loop
 
@@ -24,14 +25,14 @@ Every design decision and every PR must satisfy all of these. See `docs/IMPLEMEN
 
 ## Architecture and access model
 
-Evidence Engine is a single MCP (Model Context Protocol) server exposing the deterministic evidence engine as tools and resources, connected to a ChatGPT App and a Codex plugin — surfaces every University of Utah student already has through their Enterprise/Edu seat. We never call an LLM ourselves (I3); the host platform's own model reasons under the student's seat, constrained by our tool contracts. There is no public website as a product surface and no per-student API key to fund.
+Evidence Engine is an MCP (Model Context Protocol) server exposing four model-facing workflow tools (`start_challenge`, `submit_prediction`, `submit_diagnosis`, `submit_repair`) behind an opaque signed challenge token, connected to a ChatGPT App and a Codex plugin. Internal pipeline steps (property selection, mutation synthesis, kill-ratio filtering) are never separately callable by the host model. We never call an LLM ourselves (I3); the host platform's own model reasons under the student's seat, constrained by the tool contracts, and narrates evidence records it cannot alter (I8). There is no public website as a product surface and no per-student API key to fund.
 
-Canvas integration (read-only, I4) lets the practice-generation pipeline target what a student's actual course is covering, without the student describing it manually.
+Canvas integration (read-only, narrowed, gated — I4) lets the practice-generation pipeline target what a student's actual course is covering, once institutional approval confirms the data flow is allowed.
 
-- **Selection:** curated challenge templates, procedural variation of them, and live-synthesized scenarios from a named topic or Canvas-derived topic — never a student's own submitted code (I1).
-- **Evidence:** canonical, generated-and-verified tests, always executed, never an LLM grade (I2).
+- **Selection:** a declarative property-DSL catalog (predefined, reviewed property constructors — never free-form model-authored executable code) applied to a curated reference-implementation library, procedural variation, or a named/Canvas-derived topic — never a student's own submitted code (I1).
+- **Evidence:** tests executed inside Evidence Engine's own sandbox, signed, always real, never an LLM's self-report (I2, I8).
 - **Interpretation:** qualitative, event-level evidence only.
-- **Coaching:** guides a learner through evidence via Socratic dialogue, structurally unable to supply a repair implementation or determine pass/fail (I6).
-- **Knowledge tracing:** a real Bayesian Knowledge Tracing model drives what gets targeted next; its output is never surfaced as a score to a student or instructor.
+- **Coaching:** guides a learner through evidence via Socratic dialogue, never given the hidden tests or canonical repair before a repair attempt (I6).
+- **Knowledge tracing:** deferred. A transparent, documented practice-selection heuristic (recent success by skill tag) targets content for now; it is explicitly not a mastery estimate. Real Bayesian Knowledge Tracing is out of scope until a pilot produces data to calibrate it.
 
-Full detail: `docs/VISION.md` (product framing), `docs/IMPLEMENTATION_PLAN.md` (phased build plan), `docs/MCP_SERVER.md` (tool contracts, written alongside Phase 2), `docs/CANVAS_INTEGRATION.md` (written alongside Phase 3).
+Full detail: `docs/VISION.md` (product framing), `docs/IMPLEMENTATION_PLAN.md` (phased build plan, including the external-review-driven revision that introduced I8 and narrowed I1/I4/I6), `docs/MCP_SERVER.md` (tool contracts, written alongside the MCP-workflow phase), `docs/CANVAS_INTEGRATION.md` (written alongside the Canvas phase).

@@ -10,17 +10,18 @@
 
 Do not load every memory file. The normal context budget is the index, at most two semantic records, and one episodic handoff.
 
-## Product invariants (I1-I7, full rationale in `docs/IMPLEMENTATION_PLAN.md` §2 / `docs/PROJECT_CHARTER.md`)
+## Product invariants (I1-I8, full rationale in `docs/IMPLEMENTATION_PLAN.md` §1 / `docs/PROJECT_CHARTER.md`)
 
-- **I1** Never read, modify, execute, or operate on a student's actual coursework, homework, or exam submission. All practice content is curated or procedurally generated in our own safe space. Anything a student pastes is a topic hint at most, never literal content to mutate and hand back.
-- **I2** Never make a mastery percentage or let a model determine pass/fail. Evidence always comes from a real, executed, deterministic verification.
-- **I3** Never call an LLM on a student's behalf from our own infrastructure. The host platform's (ChatGPT's/Codex's) own model does all reasoning, under the student's existing seat.
-- **I4** Canvas access is read-only, student-consented, and scoped to course materials — never gradebook, submissions, or another student's data. Enforce this in code even if a broader token is ever presented, not just via the requested OAuth scope.
-- **I5** No server-side learner data store, no login, no PII, no student records, private repositories, credentials, names, IDs, or emails in memory files. Skill-state lives client-side only.
-- **I6** The non-evaluative guardrail is structural: any tool that coaches/diagnoses must never receive the verdict as part of its own input/output schema.
-- **I7** Any new tool exposed to the host model must extend the shared non-evaluative guardrail test suite before merge.
-- Keep challenge selection, deterministic evidence generation, and learning interpretation separate.
-- Execute only canonical, allowlisted fixture variants, or code generated and verified by our own pipeline — never arbitrary user-provided code.
+- **I1** Never read, modify, execute, or operate on a student's actual coursework, homework, exam, quiz, or discussion content. All practice content is curated, procedurally generated, or drawn from a vetted reference-implementation catalog. Anything a student pastes is a topic hint at most, never literal content to mutate and hand back.
+- **I2** Never make a mastery percentage or let a model determine pass/fail. Evidence always comes from tests executed inside Evidence Engine's own controlled, isolated sandbox — never self-reported by the host platform (I8 is the mechanism).
+- **I3** Never call an LLM on a student's behalf from our own infrastructure. The host platform's (ChatGPT's/Codex's) own model does the conversational reasoning, under the student's existing seat — no per-student LLM cost. We do host and pay for the verification sandbox (I8); that's execution, not LLM inference.
+- **I4** Canvas access is read-only, student-consented, narrowed to syllabus and module/topic titles by default, and gated behind confirmed institutional data-policy approval — no real Canvas content is transmitted anywhere until that's documented. Assignment/quiz/discussion/submission content is excluded from the allowlist entirely, and enforced in code even if a broader token is ever presented.
+- **I5** No server-side learner data store, no separate Evidence Engine account/login, no PII, no student records, private repositories, credentials, names, IDs, or emails in memory files. Skill-state lives client-side only. (The host platforms' own logins — UofU SSO, Canvas OAuth — are pre-existing and outside this invariant.)
+- **I6** The non-evaluative guardrail works by never giving the coaching model access to hidden tests or the canonical repair before a repair attempt is submitted — not by omitting a schema field. Verified against a behavioral answer-leakage/over-helping eval set.
+- **I7** Any new tool exposed to the host model must extend the shared guardrail test suite before merge, including the behavioral eval set.
+- **I8** Every evidence record is produced by Evidence Engine's own sandboxed execution and cryptographically signed (challenge ID+version, code hashes, test-suite version, seed, runtime digest, exit status, per-property results). The host model can narrate it; it cannot alter or fabricate it.
+- Keep challenge selection, sandboxed evidence generation, and learning interpretation separate.
+- Properties are expressed through a reviewed, declarative DSL — never free-form model-authored executable code, since Evidence Engine now executes that code itself.
 
 ## Working agreement
 
