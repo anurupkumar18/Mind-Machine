@@ -2,9 +2,9 @@
 
 I7: "Any new tool exposed to the host model must extend the shared
 guardrail test suite before merge, including the answer-leakage/
-over-helping behavioral eval set." This is that suite's first version,
-covering the three pre-repair tools (`start_challenge`,
-`submit_prediction`, `submit_diagnosis`). `submit_repair` is exempt by
+over-helping behavioral eval set." This suite covers `start_challenge`
+(both its challenge_id and topic-based forms), `list_course_topics`,
+`submit_prediction`, and `submit_diagnosis`. `submit_repair` is exempt by
 design -- it's the one tool meant to carry evidence-only fields.
 
 I6: the guardrail holds because hidden test inputs, the reference
@@ -180,3 +180,17 @@ async def test_submit_repair_is_the_only_tool_allowed_to_carry_evidence_fields()
     payload = _payload(result)
     assert "property_results" in payload
     assert "signature" in payload
+
+
+async def test_list_course_topics_never_leaks_hidden_content() -> None:
+    async with connected_client() as session:
+        result = await session.call_tool("list_course_topics", {})
+
+    _assert_no_leak(_payload(result))
+
+
+async def test_start_challenge_via_topic_never_leaks_hidden_content() -> None:
+    async with connected_client() as session:
+        result = await session.call_tool("start_challenge", {"topic": "graph traversal"})
+
+    _assert_no_leak(_payload(result))
