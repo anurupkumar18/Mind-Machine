@@ -2,7 +2,7 @@
 
 ## One line
 
-Evidence Engine proves a student can actually reason about and repair code — not by asking an AI to grade them, but by making them predict, break, and fix real, running code and showing them a real passing test as proof — delivered inside the ChatGPT and Codex access every University of Utah student already has, at zero incremental cost per student, and grounded in what their own Canvas course is actually teaching.
+Evidence Engine proves a student can actually reason about and repair code — not by asking an AI to grade them, but by making them predict, break, and fix real, running code and showing them evidence from tests executed in Evidence Engine's own sandbox — delivered inside the ChatGPT and Codex access University of Utah students can already get through their institutional account, and grounded in what their own Canvas course is teaching once institutional approval allows it.
 
 ## The problem
 
@@ -16,60 +16,54 @@ A CS1/CS2-and-beyond student who wants to close the gap between "I watched it" a
 
 - Not a chatbot. There is no open-ended "ask me anything" box that answers questions directly.
 - Not a grading system. It never produces a score, a mastery percentage, or a pass/fail judgment from a model's opinion.
-- Not a hardcoded demo. The engine is fixture-driven and content-agnostic; every scenario runs through the same deterministic pipeline, and it generates fresh scenarios rather than repeating a fixed set.
-- Not something you install, configure, pay for, or need a technical background for — it lives inside ChatGPT and Codex, which you already have.
-- **Not something that ever touches your real homework, exam, or graded submission.** Every practice scenario is curated or procedurally generated in Evidence Engine's own safe space — nothing you paste is ever mutated and handed back to you; at most it tells the system what topic to generate practice on.
+- Not a hardcoded demo. The engine is fixture-driven and content-agnostic; every scenario runs through the same pipeline, and it generates fresh scenarios rather than repeating a fixed set.
+- Not something you install, configure, pay for, or need a technical background for — it lives inside ChatGPT and Codex.
+- **Not something that ever touches your real homework, exam, quiz, discussion post, or graded submission.** Every practice scenario is curated or procedurally generated in Evidence Engine's own safe space, drawn from a vetted reference-implementation catalog — nothing you paste is ever mutated and handed back to you; at most it tells the system what topic to generate practice on.
+- **Not a system that treats a host-reported test result as proof of execution.** Evidence comes from tests Evidence Engine runs itself, in its own sandbox — never a claim self-reported by the model doing the coaching.
 
 ## The core loop
 
 `objective → plan commitment → prediction → controlled bug → diagnosis → repair → deterministic evidence → targeted retry`
 
-The student commits to a plan, predicts what a real algorithm will do next, gets a realistic bug injected into working code, diagnoses it through Socratic dialogue (the AI asks, it never tells), repairs it, and sees the result of an actual test run — not a model's opinion of whether they're right.
+The student commits to a plan, predicts what a real algorithm will do next, gets a realistic bug injected into working code, diagnoses it through Socratic dialogue (the AI asks, it never tells), repairs it, and sees the result of a test Evidence Engine actually ran — not a model's opinion of whether they're right.
 
 ## How it actually runs
 
-Evidence Engine is a single MCP (Model Context Protocol) server exposing a deterministic evidence engine as tools and resources, connected to two surfaces students already have through their University of Utah Enterprise/Edu seat: a ChatGPT App and a Codex plugin. **We never call an LLM on a student's behalf** — the Socratic dialogue is ChatGPT's or Codex's own model, reasoning under the student's own seat, constrained by our tool contracts; our code only ever returns real, deterministic results (a generated scenario, a test outcome, an evidence record). When connected, practice is grounded in the student's own Canvas course (syllabus, modules, materials — read-only, never gradebook or submissions).
+Evidence Engine is an MCP (Model Context Protocol) server connected to two surfaces a University of Utah student can access through their institutional ChatGPT/Codex account: a ChatGPT App and a Codex plugin. The host platform's own model handles the conversational reasoning — we never call an LLM on a student's behalf, so we carry no per-student LLM inference cost. What we do run and pay for is a small, isolated **verification sandbox**: when a student submits a repair, Evidence Engine executes the hidden tests itself, in a controlled container we own, and returns a signed evidence record. The host model can narrate that record to the student; it cannot alter it, and it never sees the hidden tests or the canonical repair before the student submits an attempt. When connected, and once institutional approval for the data flow is confirmed, practice is grounded in the student's own Canvas course (syllabus and module/topic titles — read-only, never gradebook, submissions, assignments, quizzes, or discussions).
 
 ## Why this wins
 
-1. **It's verifiable, not vibes-based, and it never runs out of content.** Evidence comes from a real, generated, executed test on freshly synthesized scenarios — not a fixed puzzle bank, and never anything that could cost a student a grade.
-2. **The pedagogy and the engagement design are both real research, not decoration.** Retrieval practice (testing effect, meta-analytic g≈0.74), desirable difficulty / productive failure, and guardrailed Socratic dialogue drive *learning*; flow theory's challenge-skill balance (via real knowledge tracing) and growth-mindset-consistent non-evaluative framing drive *wanting to come back*. A 2025 Harvard RCT found AI tutoring produced roughly double the learning rate of active-learning classrooms — with the finding's own caveat that success comes from pedagogical guardrails, not the raw model. This product is built around that caveat, not despite it.
-3. **It's genuinely accessible at zero incremental cost.** No new account, no API key, no download beyond what a University of Utah student already has through their Enterprise/Edu seat — and no per-student LLM bill for us to fund, because we never call one.
-4. **It's real, hard AI engineering, not a wrapper — pointed at something that can only help, never hurt, a student's standing.** Property-based invariant validation, AST-level mutation synthesis with kill-ratio filtering, an information-theoretic (not just promised) non-evaluative guardrail, and real Bayesian knowledge tracing — applied entirely within a zero-stakes practice space, by explicit design.
-5. **It's grounded in a real, already-adopted institutional data source, read-only.** Practice is targeted at what a student's own Canvas course is actually teaching, without requiring the student to describe it themselves, and without ever touching a grade, a submission, or anyone else's data — the read/never-read boundary is enforced by Canvas's own scoped-token system, not just a promise in our code.
+1. **Its evidence is real, not self-reported.** A signed record from Evidence Engine's own sandbox execution — challenge version, code hashes, test-suite version, seed, exit status, per-property results — not a shape-checked claim from whichever platform happens to be hosting the conversation.
+2. **The pedagogy and the engagement design are both grounded in cited research, not decoration.** Retrieval practice (testing effect), desirable difficulty/productive failure, and guardrailed Socratic dialogue drive learning; a flow-theory-informed practice-selection heuristic and growth-mindset-consistent non-evaluative framing drive wanting to come back. A 2025 Harvard RCT found AI tutoring roughly doubled the learning rate of active-learning classrooms under its own studied conditions (194 students, two structured intro-physics lessons) — that result motivates this design; it doesn't validate this specific product, and we don't claim otherwise.
+3. **It's accessible without a separate account, API key, or payment.** It uses whatever ChatGPT/Codex access a student's University of Utah account already has — no new signup for Evidence Engine itself, though the underlying institutional access (Enterprise/Edu enrollment, SSO) is a real prerequisite we don't control or eliminate.
+4. **It's real, substantial engineering, not a wrapper.** A declarative property catalog, AST-level mutation synthesis with kill-ratio filtering, a genuinely isolated verification sandbox, and a non-evaluative guardrail enforced by never exposing hidden tests to the coaching model — not a prompt wrapped around a chat window.
+5. **Canvas grounding is opt-in, narrow, and gated.** When approved, it reads syllabus and topic titles only — never assignments, quizzes, discussions, or submissions — and the read/never-read boundary is enforced by Canvas's own scoped tokens, our own code, and a confirmed institutional data-policy decision before any real content flows anywhere.
 
 ## Scope tiers
 
-- **Core (the demo centerpiece):** the invariant-derivation → mutation-synthesis → repair-verification pipeline generating fresh, verified practice scenarios on demand — sourced from the student's own Canvas syllabus/modules (read-only) when connected, a named topic, or procedural variation of the curated library — never from a student's own submitted work — plus the real (simple) BKT skill model keeping difficulty in the engagement sweet spot.
-- **Stretch:** the ChatGPT App's custom trace/visual-diff UI widgets; skill-state cross-device transfer (QR-based).
-- **Moonshot:** an adversarial, self-verifying content pipeline expanding the safe seed/reference library without a human bottleneck; an aggregated, fully anonymized instructor-facing dashboard (never able to identify an individual student, so it can never be used against one).
-
-## Non-negotiable invariants
-
-See `docs/PROJECT_CHARTER.md` and `docs/IMPLEMENTATION_PLAN.md` §2 for the enforced, numbered versions (I1-I7). Summary:
-
-- No model ever decides pass/fail or produces a mastery score — evidence always comes from a real, canonical test run.
-- No login, no PII, no server-side persistence of learner responses.
-- Our infrastructure never calls an LLM on a student's behalf — all reasoning happens inside the platform the student already has access to.
-- Canvas access is read-only, student-consented, and scoped to course materials — never gradebook, submissions, or another student's data.
-- The non-evaluative guardrail is structural (built into tool schemas), not just a prompt instruction.
-- Any new feature that adds a tool the host model can call must extend the shared non-evaluative guardrail test suite before it ships.
+- **Core:** the property-DSL-constrained mutation → server-side verification loop, generating varied practice scenarios from a curated reference-implementation catalog, a named topic, or (once approved) Canvas-derived context — never from a student's own submitted work — plus a transparent, honestly-framed practice-selection heuristic (see "Known limits").
+- **Stretch:** the ChatGPT App's custom trace/visual-diff UI widgets; skill-state cross-device transfer (QR-based); the instructor dashboard.
+- **Deferred to post-pilot:** real Bayesian Knowledge Tracing (see below); an adversarial self-verifying content pipeline for expanding the catalog without a human bottleneck.
 
 ## Known limits (stated up front, not discovered by a judge)
 
-- Works best on pure, deterministic code with clear input/output behavior; code with side effects or ambiguous correctness gets an honest "not a good fit yet" rather than a bad result.
-- Knowledge-tracing confidence is genuinely low on a student's first few attempts at a skill — shown honestly as growing confidence over a session, not claimed as immediate precision.
-- Verification execution is trusted to the host platform's sandbox rather than infrastructure we control, mitigated but not eliminated by requiring a structured, validated verdict format.
+- Works best on pure, deterministic code with clear input/output behavior.
+- **No real knowledge tracing yet.** What targets practice content is a transparent heuristic (recent pass/fail rate per skill tag) — explicitly not a calibrated mastery estimate. Real Bayesian Knowledge Tracing needs a stable skill taxonomy, a challenge-to-skill mapping, calibrated parameters, and pilot data to validate against; none of that exists yet, so we're not claiming it.
+- Verification now runs in Evidence Engine's own sandbox, which is real infrastructure we built and are responsible for securing (isolation, resource limits) — this is a stronger evidence claim than relying on the host platform, but it's not a claim that the sandbox is unbreakable.
 - By design, the tool cannot help with an actual graded assignment directly — that's a deliberate boundary, not a missing feature.
-- "Learning style" personalization deliberately means modality/scaffolding choice (text, voice, visual diff, support level), not the VARK-style model, which the cognitive-science literature doesn't support as a basis for tailoring instruction — stated honestly rather than oversold.
-- Canvas integration only helps for courses that actually use Canvas's syllabus/module features with real content in them.
+- "Learning style" personalization means modality/scaffolding choice (text, voice, visual diff, support level), not the VARK-style model, which the cognitive-science literature doesn't support as a basis for tailoring instruction.
+- Canvas integration only helps for courses that actually use Canvas's syllabus/module features with real content in them, and only reaches syllabus/topic-title-level detail by default.
+- "Never repeats" is not a guarantee — content is varied and repetition is minimized by tracking consumed challenge/variant IDs locally, not a mathematical impossibility of repeats.
+- A passing test suite is evidence for the properties it checks, not a proof of general correctness — any finite test suite has coverage boundaries.
 
 ## Explicitly out of scope (for now)
 
-- Non-code subjects (math, history, etc.) — the verifiable-evidence mechanism is specific to checkable code/algorithms; broadening subject matter would force LLM-graded evaluation and give up the core differentiator.
-- Accounts, login, or any server-side learner data store.
-- A standalone public website as a product surface — the product lives inside ChatGPT/Codex; judging happens via a live screen-share demo, not a public link.
-- Writing to Canvas in any way, or reading anything beyond course materials (gradebook, submissions, other students' data).
+- Non-code subjects (math, history, etc.) — the verifiable-evidence mechanism is specific to checkable code/algorithms.
+- Accounts, login, or any server-side learner data store of our own.
+- A standalone public website as a product surface — the product lives inside ChatGPT/Codex; judging happens via a live screen-share demo.
+- Writing to Canvas, or reading anything beyond syllabus/topic titles unless institutional approval explicitly extends that.
+- Real Bayesian Knowledge Tracing (see "Scope tiers") until a pilot produces data to calibrate against.
+- Letting a model author executable verification code directly — properties are expressed through a reviewed, declarative catalog, never free-form model-generated Python, since Evidence Engine now executes that code itself.
 
 ## Naming note
 
