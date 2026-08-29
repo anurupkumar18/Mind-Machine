@@ -68,6 +68,15 @@ _BINARY_SEARCH_TEST_INPUTS: list[dict[str, Any]] = [
     {"sorted_values": [1, 3, 5, 7, 9], "target": 7},
     {"sorted_values": [5], "target": 5},
     {"sorted_values": [1, 2, 3, 4, 5], "target": 10},
+    # Catches a `high = mid - 1` boundary mutation (e.g. mid - 2, mid - 0):
+    # target sits at the specific index those variants skip or loop past.
+    {"sorted_values": [1, 2, 3, 4, 5, 6, 7], "target": 3},
+    # Catches `high = mid - 1` -> `high = mid - 0` specifically: a target
+    # below every element leaves low == high unchanged forever, which
+    # hangs (correctly caught as a timeout, not a wrong answer) rather
+    # than terminating -- the correct reference implementation still
+    # terminates normally on this input.
+    {"sorted_values": [5, 10], "target": 1},
 ]
 
 

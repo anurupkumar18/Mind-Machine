@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import ast
 
+from app.domain.kill_ratio import classify_mutant
 from app.domain.mutation import generate_constant_mutants
 from app.domain.sandbox import FIXTURES_ROOT, execute_repair
 
@@ -60,10 +61,9 @@ def test_at_least_one_binary_search_constant_mutant_is_killed() -> None:
     mutants = generate_constant_mutants(BINARY_SEARCH_SOURCE)
     assert mutants, "expected binary_search's integer literals to produce mutants"
 
-    killed = []
-    for mutant in mutants:
-        record = execute_repair(challenge_id="binary-search-invariant-01", repair_source=mutant.mutated_source)
-        if record.status.value == "completed" and any(not r.passed for r in record.property_results):
-            killed.append(mutant)
+    outcomes = [
+        classify_mutant(execute_repair(challenge_id="binary-search-invariant-01", repair_source=m.mutated_source))
+        for m in mutants
+    ]
 
-    assert killed, "expected at least one constant mutant to be killed by the existing property"
+    assert "killed" in outcomes, "expected at least one constant mutant to be killed by the existing property"
