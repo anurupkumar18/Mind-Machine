@@ -1,10 +1,15 @@
 """AST mutation-operator library (docs/IMPLEMENTATION_PLAN.md §6, Phase 2, R1).
 
-Generic comparison-operator mutation: walks any Python source's `Compare`
-nodes and swaps each operator for a standard mutation-testing replacement
-(Eq<->NotEq, Lt<->GtE, Gt<->LtE, In<->NotIn, Is<->IsNot). Not specific to
-any one challenge's structure -- application code must not branch on
-fixture-specific prose (memory/semantic/architecture.md).
+Two generic operator families so far, neither specific to any one
+challenge's structure (application code must not branch on
+fixture-specific prose, memory/semantic/architecture.md):
+
+- Comparison-operator replacement: swaps a `Compare` node's operator for a
+  standard mutation-testing replacement (Eq<->NotEq, Lt<->GtE, Gt<->LtE,
+  In<->NotIn, Is<->IsNot).
+- Integer-constant boundary mutation: +1/-1 on numeric literals, the
+  classic off-by-one bug generator. Skips `bool` (an `int` subclass in
+  Python) since `True`/`False` aren't boundary values in this sense.
 
 This is the operator library only. Kill-ratio filtering and
 equivalent-mutant tolerance (§6 Phase 2) are not implemented here yet --
@@ -69,6 +74,45 @@ def generate_comparison_mutants(source: str) -> list[Mutant]:
                 Mutant(
                     mutant_id=mutant_id,
                     operator="comparison_operator_replacement",
+                    description=description,
+                    mutated_source=mutated_source,
+                )
+            )
+
+    return mutants
+
+
+def _int_constant_nodes(tree: ast.AST) -> list[ast.Constant]:
+    return [
+        node
+        for node in ast.walk(tree)
+        if isinstance(node, ast.Constant) and type(node.value) is int
+    ]
+
+
+def generate_constant_mutants(source: str) -> list[Mutant]:
+    tree = ast.parse(source)
+    original_nodes = _int_constant_nodes(tree)
+    mutants = []
+
+    for node_index, node in enumerate(original_nodes):
+        original_value = node.value
+        assert type(original_value) is int  # narrows for mypy; _int_constant_nodes already filtered this
+        for delta in (1, -1):
+            new_value = original_value + delta
+
+            mutant_tree = copy.deepcopy(tree)
+            mutant_node = _int_constant_nodes(mutant_tree)[node_index]
+            mutant_node.value = new_value
+            ast.fix_missing_locations(mutant_tree)
+            mutated_source = ast.unparse(mutant_tree)
+
+            description = f"{original_value}->{new_value} at constant #{node_index}"
+            mutant_id = hashlib.sha256(f"integer_constant_boundary:{description}".encode()).hexdigest()[:16]
+            mutants.append(
+                Mutant(
+                    mutant_id=mutant_id,
+                    operator="integer_constant_boundary",
                     description=description,
                     mutated_source=mutated_source,
                 )
