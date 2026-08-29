@@ -1,10 +1,8 @@
 """Phase 3 (docs/IMPLEMENTATION_PLAN.md §3.2): submit_repair is the only
 tool that triggers real sandboxed execution (I8). This wires the MCP
 surface from Phase 1 spike 2 to the sandbox kernel from Phase 2 -- until
-now the two were unconnected. Scoped simplification, stated explicitly:
-this does not yet implement the opaque signed challenge token session
-(§3.2's token issuance/validation) -- submit_repair takes challenge_id
-directly. That's real remaining Phase 3 work, not silently assumed done.
+now the two were unconnected. It also now goes through the opaque signed
+challenge token, not a raw challenge_id, matching §3.2's tool surface.
 """
 
 from __future__ import annotations
@@ -65,6 +63,13 @@ async def connected_client() -> AsyncIterator[ClientSession]:
             tg.cancel_scope.cancel()
 
 
+async def _start(session: ClientSession) -> str:
+    result = await session.call_tool("start_challenge", {"challenge_id": "traversal-invariant-02"})
+    payload = json.loads(result.content[0].text)  # type: ignore[union-attr]
+    token: str = payload["challenge_token"]
+    return token
+
+
 async def test_submit_repair_tool_is_discoverable() -> None:
     async with connected_client() as session:
         tools = await session.list_tools()
@@ -75,9 +80,10 @@ async def test_submit_repair_tool_is_discoverable() -> None:
 
 async def test_submit_repair_returns_a_signed_evidence_record_via_the_real_sandbox() -> None:
     async with connected_client() as session:
+        token = await _start(session)
         result = await session.call_tool(
             "submit_repair",
-            {"challenge_id": "traversal-invariant-02", "repair_source": GOOD_REPAIR},
+            {"challenge_token": token, "repair_source": GOOD_REPAIR},
         )
 
     assert result.is_error is not True
@@ -90,11 +96,24 @@ async def test_submit_repair_returns_a_signed_evidence_record_via_the_real_sandb
 
 async def test_submit_repair_with_disallowed_code_is_reported_not_executed() -> None:
     async with connected_client() as session:
+        token = await _start(session)
         result = await session.call_tool(
             "submit_repair",
-            {"challenge_id": "traversal-invariant-02", "repair_source": "import os\ndef bfs(g,s): return [s]"},
+            {"challenge_token": token, "repair_source": "import os\ndef bfs(g,s): return [s]"},
         )
 
     assert result.is_error is not True
     payload = json.loads(result.content[0].text)  # type: ignore[union-attr]
     assert payload["status"] == "rejected"
+
+
+async def test_submit_repair_with_a_tampered_token_is_rejected() -> None:
+    async with connected_client() as session:
+        token = await _start(session)
+        tampered = token[:-1] + ("0" if token[-1] != "0" else "1")
+        result = await session.call_tool(
+            "submit_repair",
+            {"challenge_token": tampered, "repair_source": GOOD_REPAIR},
+        )
+
+    assert result.is_error is True

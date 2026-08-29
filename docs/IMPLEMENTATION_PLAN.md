@@ -142,6 +142,7 @@ Curated reference implementations + versioned hidden tests; the property DSL and
 ### Phase 3 — MCP workflow
 The 4 workflow tools (§3.2) with opaque signed challenge tokens; structured trace metadata per response; I6 enforced by never sending hidden tests/canonical repairs to the coaching model's context; the answer-leakage/over-helping behavioral eval set (I6, I7).
 **Definition of Done**: full predict→diagnose→repair→evidence loop runs end-to-end against Phase 2's kernel; the behavioral eval set passes; no tool response prior to `submit_repair` contains verdict or hidden-test information.
+**Status**: the 4-tool surface and the opaque signed challenge token exist and the full loop runs end-to-end (`apps/api/app/mcp_server.py`, verified over a real stdio subprocess, not just in-memory tests — see `memory/episodic/0021-*.md`). Not done yet: the answer-leakage/over-helping behavioral eval set (I6, I7) — a test confirms `submit_diagnosis`'s response has no verdict/hidden-test fields for one case, which is not the same as a real eval set. Token verification also doesn't enforce tool-call ordering yet (nothing stops calling `submit_repair` first).
 
 ### Phase 4 — Canvas integration
 Proceeds only once Phase 1's Canvas spike resolves. Narrowed allowlist, backup/caching ingestion path, `docs/CANVAS_INTEGRATION.md`.

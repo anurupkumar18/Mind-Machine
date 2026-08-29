@@ -59,6 +59,7 @@ async def test_start_challenge_returns_grounded_challenge_data() -> None:
     assert payload["challenge_id"] == "traversal-invariant-02"
     assert payload["expected_first_frontier"] == ["B", "C"]
     assert payload["trace"]["tool"] == "start_challenge"
+    assert payload["challenge_token"]
 
 
 async def test_unknown_challenge_id_is_reported_as_tool_error_not_a_crash() -> None:
