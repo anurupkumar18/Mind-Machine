@@ -158,3 +158,26 @@ class PropertySpec(BaseModel):
 class PropertyCheckResult(BaseModel):
     passed: bool
     detail: str
+
+
+class CanvasModule(BaseModel):
+    id: int
+    name: str
+
+
+class CanvasCourseContext(BaseModel):
+    course_name: str
+    syllabus_body: str
+    modules: list[CanvasModule]
+
+
+class TopicMatch(BaseModel):
+    module_name: str
+    matched_challenge_id: str | None
+    matched_terms: list[str]
+
+
+class CourseTopicsResponse(BaseModel):
+    course_name: str
+    syllabus_body: str
+    topics: list[TopicMatch]
