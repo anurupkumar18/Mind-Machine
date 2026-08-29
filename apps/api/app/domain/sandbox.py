@@ -16,10 +16,12 @@ import hashlib
 import hmac
 import json
 import os
+import random
 import resource
 import subprocess
 import sys
 import tempfile
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from enum import StrEnum
 from pathlib import Path
@@ -80,6 +82,24 @@ _BINARY_SEARCH_TEST_INPUTS: list[dict[str, Any]] = [
 ]
 
 
+def _random_bfs_input(rng: random.Random) -> dict[str, Any]:
+    node_count = rng.randint(1, 6)
+    nodes = [chr(ord("A") + i) for i in range(node_count)]
+    graph: dict[str, list[str]] = {}
+    for node in nodes:
+        others = [n for n in nodes if n != node]
+        edge_count = rng.randint(0, len(others))
+        graph[node] = rng.sample(others, edge_count)
+    return {"graph": graph, "start": rng.choice(nodes)}
+
+
+def _random_binary_search_input(rng: random.Random) -> dict[str, Any]:
+    length = rng.randint(1, 15)
+    values = sorted(rng.sample(range(-50, 50), length))
+    target = rng.choice(values) if rng.random() < 0.5 else rng.randint(-60, 60)
+    return {"sorted_values": values, "target": target}
+
+
 @dataclass(frozen=True)
 class ChallengeConfig:
     entry_point: str
@@ -89,6 +109,10 @@ class ChallengeConfig:
     # names (see test_sandbox_generalization.py).
     test_inputs: list[dict[str, Any]]
     property_spec: PropertySpec
+    # Generates one random, valid input for this challenge -- used by
+    # app.domain.equivalence for differential testing, not by hidden-test
+    # evaluation (which uses the fixed `test_inputs` above).
+    input_generator: Callable[[random.Random], dict[str, Any]]
 
 
 _CHALLENGES: dict[str, ChallengeConfig] = {
@@ -101,6 +125,7 @@ _CHALLENGES: dict[str, ChallengeConfig] = {
             property="output_equals_reference",
             oracle="reference_implementation_v1",
         ),
+        input_generator=_random_bfs_input,
     ),
     "binary-search-invariant-01": ChallengeConfig(
         entry_point="binary_search",
@@ -111,8 +136,21 @@ _CHALLENGES: dict[str, ChallengeConfig] = {
             property="output_equals_reference",
             oracle="reference_implementation_v1",
         ),
+        input_generator=_random_binary_search_input,
     ),
 }
+
+
+def run_oracle(challenge_id: str, case: dict[str, Any]) -> Any:
+    """Public wrapper so other modules (app.domain.equivalence) can run the
+    trusted reference implementation without reaching into sandbox
+    internals directly."""
+    config = _CHALLENGES[challenge_id]
+    return _run_oracle(config, case)
+
+
+def generate_random_case(challenge_id: str, rng: random.Random) -> dict[str, Any]:
+    return _CHALLENGES[challenge_id].input_generator(rng)
 
 
 def _run_oracle(config: ChallengeConfig, case: dict[str, Any]) -> Any:
@@ -224,10 +262,10 @@ def _preexec_limits() -> None:
         pass
 
 
-def _run_in_subprocess(repair_source: str, config: ChallengeConfig) -> tuple[int, str, str]:
+def _run_in_subprocess(repair_source: str, config: ChallengeConfig, cases: list[dict[str, Any]]) -> tuple[int, str, str]:
     runner = _RUNNER_TEMPLATE.format(
         repair_source=repair_source,
-        cases=json.dumps(config.test_inputs),
+        cases=json.dumps(cases),
         entry_point=config.entry_point,
     )
     with tempfile.TemporaryDirectory() as tmp:
@@ -247,6 +285,43 @@ def _run_in_subprocess(repair_source: str, config: ChallengeConfig) -> tuple[int
         except subprocess.TimeoutExpired:
             return -1, "", "timed out"
         return completed.returncode, completed.stdout, completed.stderr
+
+
+@dataclass(frozen=True)
+class CaseOutcome:
+    ok: bool
+    output: Any = None
+    error: str = ""
+
+
+def run_cases(*, challenge_id: str, repair_source: str, cases: list[dict[str, Any]]) -> list[CaseOutcome] | None:
+    """Runs `repair_source` against `cases` in the sandbox, independent of
+    the challenge's own configured hidden tests. Returns None if execution
+    didn't reach a per-case result at all (unknown challenge, disallowed
+    code, syntax error, process error, or timeout) -- callers needing that
+    level of detail should use `execute_repair` instead. Used by
+    `execute_repair` itself (against `config.test_inputs`) and by
+    `app.domain.equivalence` (against randomly generated inputs).
+    """
+    config = _CHALLENGES.get(challenge_id)
+    if config is None or _contains_disallowed_names(repair_source):
+        return None
+
+    try:
+        ast.parse(repair_source)
+    except SyntaxError:
+        return None
+
+    returncode, stdout, stderr = _run_in_subprocess(repair_source, config, cases)
+    if returncode != 0 or (returncode == -1 and stderr == "timed out"):
+        return None
+
+    try:
+        parsed = json.loads(stdout)
+    except (json.JSONDecodeError, ValueError):
+        return None
+
+    return [CaseOutcome(ok=bool(item["ok"]), output=item.get("output"), error=item.get("error", "")) for item in parsed]
 
 
 def execute_repair(*, challenge_id: str, repair_source: str) -> EvidenceRecord:
@@ -277,7 +352,7 @@ def execute_repair(*, challenge_id: str, repair_source: str) -> EvidenceRecord:
         record.sign()
         return record
 
-    returncode, stdout, stderr = _run_in_subprocess(repair_source, config)
+    returncode, stdout, stderr = _run_in_subprocess(repair_source, config, config.test_inputs)
 
     if returncode == -1 and stdout == "" and stderr == "timed out":
         record.status = ExecutionStatus.TIMED_OUT
