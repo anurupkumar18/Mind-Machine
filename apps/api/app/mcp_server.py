@@ -1,20 +1,24 @@
-"""Phase 1 spike 2: a real MCP tool backed by Evidence Engine's domain logic.
+"""Evidence Engine's MCP tool surface (docs/IMPLEMENTATION_PLAN.md §3.2).
 
-Minimal scope on purpose: one tool, one fixed challenge, stdio transport.
-Proves an MCP client can discover and invoke a tool that returns real,
-fixture-grounded data through the actual MCP protocol -- not a stub. The
-opaque signed challenge token and the full 4-tool workflow surface
-(docs/IMPLEMENTATION_PLAN.md §3.2) are Phase 3 work, not this spike.
+Started as a Phase 1 spike (one tool, proving real protocol connectivity)
+and now also carries `submit_repair`, the Phase 3 tool that triggers real
+sandboxed execution (I8) via `app.domain.sandbox`. Still a known
+simplification, stated explicitly: this does not yet implement the opaque
+signed challenge token session (§3.2) -- tools take challenge_id directly
+rather than an issued token, and `submit_prediction`/`submit_diagnosis`
+don't exist yet. That's real remaining Phase 3 work.
 """
 
 from __future__ import annotations
 
+from dataclasses import asdict
 from typing import Any
 
 from mcp.server.mcpserver import MCPServer
 
 from app.domain.fixtures import fixture_data
 from app.domain.runtime import canonical_next_frontier
+from app.domain.sandbox import execute_repair
 
 KNOWN_CHALLENGES = {"traversal-invariant-02"}
 
@@ -44,6 +48,21 @@ def start_challenge(challenge_id: str) -> dict[str, Any]:
         "expected_first_frontier": frontier,
         "trace": {"stage": "planner", "tool": "start_challenge"},
     }
+
+
+@mcp.tool()
+def submit_repair(challenge_id: str, repair_source: str) -> dict[str, Any]:
+    """Execute a submitted repair in Evidence Engine's own sandbox (I8).
+
+    Returns the signed evidence record. The host model can narrate this
+    result; it cannot alter it, and never sees hidden test inputs or the
+    reference implementation's source.
+    """
+    record = execute_repair(challenge_id=challenge_id, repair_source=repair_source)
+    payload = asdict(record)
+    payload["status"] = record.status.value
+    payload["trace"] = {"stage": "verifier", "tool": "submit_repair"}
+    return payload
 
 
 def main() -> None:

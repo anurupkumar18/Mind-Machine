@@ -106,3 +106,20 @@ def test_unknown_challenge_id_is_rejected() -> None:
     record = execute_repair(challenge_id="does-not-exist", repair_source=GOOD_REPAIR)
 
     assert record.status is ExecutionStatus.REJECTED
+
+
+def test_property_results_are_produced_via_the_declarative_property_dsl() -> None:
+    """Phase 2 (§3.1): expected outputs come from executing the reference
+    oracle, not from hand-authored golden values baked into the sandbox."""
+    record = execute_repair(challenge_id="traversal-invariant-02", repair_source=GOOD_REPAIR)
+
+    assert record.property_results
+    assert all(result.name.endswith(":output_equals_reference") for result in record.property_results)
+
+
+def test_bad_repair_failure_detail_cites_the_oracle_mismatch() -> None:
+    record = execute_repair(challenge_id="traversal-invariant-02", repair_source=BAD_REPAIR)
+
+    failing = [result for result in record.property_results if not result.passed]
+    assert failing
+    assert "expected" in failing[0].detail

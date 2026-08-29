@@ -171,8 +171,8 @@ Spec-first tasks referencing a phase/task ID here; verify SDK/API usage against 
 
 | ID | Risk | Phase | Mitigation | Status |
 |---|---|---|---|---|
-| R1 | Kill-ratio tuning still genuinely hard | 2 | Real iteration before the hackathon; curated fixtures as fallback | Open |
-| R2 | Content-generation quality on the property-DSL catalog | 2, 7 | Catalog is human-reviewed and narrow by design, lower risk than free-form hypothesis generation | Open, reduced |
+| R1 | Kill-ratio tuning still genuinely hard | 2 | Real iteration before the hackathon; curated fixtures as fallback | Open — AST mutation-operator library not started yet |
+| R2 | Content-generation quality on the property-DSL catalog | 2, 7 | Catalog is human-reviewed and narrow by design, lower risk than free-form hypothesis generation | Open, reduced. First slice built: `app.domain.properties` implements `output_equals_reference` and `output_is_permutation` against a reference-oracle execution model (not hand-authored expected values) — see `memory/episodic/0019-*.md` |
 | R3 | ~~Remote-execution trust boundary~~ | — | **Resolved** — verification is server-side and signed (I8) | Resolved |
 | R4 | Judges likely lack a UofU seat | 9 | Live screen-share demo, no public fallback | Accepted |
 | R5 | Canvas institutional approval lead time | 1, 4 | Explicit Phase 1 blocking spike, needs a named owner | Open — needs an owner named. Confirmed blocked: UofU Canvas admins have disabled self-service access tokens (a UofU admin must generate one on request); Instructure's public trial instance is discontinued. Both self-service paths are dead ends; only a direct UofU Canvas-admin contact remains |

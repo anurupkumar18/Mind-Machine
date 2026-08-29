@@ -22,11 +22,17 @@ import tempfile
 from dataclasses import dataclass, field
 from enum import StrEnum
 from pathlib import Path
+from typing import Any
+
+from app.domain.contracts import PropertySpec
+from app.domain.properties import UnknownPropertyError, evaluate_property
 
 SANDBOX_SECRET = os.getenv("EVIDENCE_ENGINE_SANDBOX_SECRET", "dev-only-sandbox-signing-key")
 
 TEST_SUITE_VERSION = "traversal-invariant-02.v1"
 RUNTIME_DIGEST = f"cpython-{sys.version_info.major}.{sys.version_info.minor}"
+
+FIXTURES_ROOT = Path(__file__).resolve().parents[4] / "fixtures"
 
 DISALLOWED_NAMES = {
     "os",
@@ -51,13 +57,46 @@ _TIMEOUT_SECONDS = 5
 _CPU_SECONDS = 2
 _ADDRESS_SPACE_BYTES = 768 * 1024 * 1024
 
-_HIDDEN_TEST_CASES = [
-    {"graph": {"A": ["B", "C"], "B": ["D"], "C": ["D"], "D": ["A"]}, "start": "A", "expected": ["A", "B", "C", "D"]},
-    {"graph": {"A": ["B"], "B": ["A"]}, "start": "A", "expected": ["A", "B"]},
-    {"graph": {"A": []}, "start": "A", "expected": ["A"]},
+_HIDDEN_TEST_INPUTS: list[dict[str, Any]] = [
+    {"graph": {"A": ["B", "C"], "B": ["D"], "C": ["D"], "D": ["A"]}, "start": "A"},
+    {"graph": {"A": ["B"], "B": ["A"]}, "start": "A"},
+    {"graph": {"A": []}, "start": "A"},
 ]
 
-_CHALLENGES = {"traversal-invariant-02"}
+
+@dataclass(frozen=True)
+class ChallengeConfig:
+    entry_point: str
+    oracle_path: Path
+    test_inputs: list[dict[str, Any]]
+    property_spec: PropertySpec
+
+
+_CHALLENGES: dict[str, ChallengeConfig] = {
+    "traversal-invariant-02": ChallengeConfig(
+        entry_point="bfs",
+        oracle_path=FIXTURES_ROOT / "repos" / "public-graph-traversal" / "bfs.py",
+        test_inputs=_HIDDEN_TEST_INPUTS,
+        property_spec=PropertySpec(
+            function="bfs",
+            property="output_equals_reference",
+            oracle="reference_implementation_v1",
+        ),
+    ),
+}
+
+
+def _run_oracle(config: ChallengeConfig, case: dict[str, Any]) -> Any:
+    """Executes the reference implementation directly, no sandbox.
+
+    This is our own reviewed fixture source, not student input -- the
+    sandbox boundary exists for the submitted repair, not for code we
+    wrote and control.
+    """
+    namespace: dict[str, Any] = {}
+    exec(config.oracle_path.read_text(encoding="utf-8"), namespace)  # noqa: S102 - trusted, reviewed fixture source
+    entry_point = namespace[config.entry_point]
+    return entry_point(dict(case["graph"]), case["start"])
 
 
 class ExecutionStatus(StrEnum):
@@ -134,13 +173,10 @@ cases = {cases}
 results = []
 for case in cases:
     try:
-        actual = bfs(dict(case["graph"]), case["start"])
-        passed = actual == case["expected"]
-        detail = f"expected {{case['expected']}}, got {{actual}}"
+        output = {entry_point}(dict(case["graph"]), case["start"])
+        results.append({{"ok": True, "output": output}})
     except Exception as error:  # noqa: BLE001 - reporting to parent, not swallowing
-        passed = False
-        detail = f"raised {{type(error).__name__}}: {{error}}"
-    results.append({{"passed": passed, "detail": detail}})
+        results.append({{"ok": False, "error": f"raised {{type(error).__name__}}: {{error}}"}})
 print(json.dumps(results))
 """
 
@@ -157,8 +193,12 @@ def _preexec_limits() -> None:
         pass
 
 
-def _run_in_subprocess(repair_source: str) -> tuple[int, str, str]:
-    runner = _RUNNER_TEMPLATE.format(repair_source=repair_source, cases=json.dumps(_HIDDEN_TEST_CASES))
+def _run_in_subprocess(repair_source: str, config: ChallengeConfig) -> tuple[int, str, str]:
+    runner = _RUNNER_TEMPLATE.format(
+        repair_source=repair_source,
+        cases=json.dumps(config.test_inputs),
+        entry_point=config.entry_point,
+    )
     with tempfile.TemporaryDirectory() as tmp:
         script_path = Path(tmp) / "runner.py"
         script_path.write_text(runner)
@@ -190,7 +230,8 @@ def execute_repair(*, challenge_id: str, repair_source: str) -> EvidenceRecord:
         exit_status=-1,
     )
 
-    if challenge_id not in _CHALLENGES:
+    config = _CHALLENGES.get(challenge_id)
+    if config is None:
         record.sign()
         return record
 
@@ -205,7 +246,7 @@ def execute_repair(*, challenge_id: str, repair_source: str) -> EvidenceRecord:
         record.sign()
         return record
 
-    returncode, stdout, stderr = _run_in_subprocess(repair_source)
+    returncode, stdout, stderr = _run_in_subprocess(repair_source, config)
 
     if returncode == -1 and stdout == "" and stderr == "timed out":
         record.status = ExecutionStatus.TIMED_OUT
@@ -228,9 +269,27 @@ def execute_repair(*, challenge_id: str, repair_source: str) -> EvidenceRecord:
 
     record.status = ExecutionStatus.COMPLETED
     record.exit_status = returncode
-    record.property_results = [
-        PropertyResult(name=f"hidden_case_{i}", passed=bool(item["passed"]), detail=str(item["detail"]))
-        for i, item in enumerate(parsed)
-    ]
+    record.property_results = _build_property_results(config, parsed)
     record.sign()
     return record
+
+
+def _build_property_results(config: ChallengeConfig, submitted_results: list[dict[str, Any]]) -> list[PropertyResult]:
+    property_results = []
+    for i, (case, submitted) in enumerate(zip(config.test_inputs, submitted_results, strict=True)):
+        name = f"case_{i}:{config.property_spec.property}"
+        if not submitted["ok"]:
+            property_results.append(PropertyResult(name=name, passed=False, detail=submitted["error"]))
+            continue
+        reference_output = _run_oracle(config, case)
+        try:
+            check = evaluate_property(
+                config.property_spec,
+                submitted_output=submitted["output"],
+                reference_output=reference_output,
+            )
+        except UnknownPropertyError as error:
+            property_results.append(PropertyResult(name=name, passed=False, detail=str(error)))
+            continue
+        property_results.append(PropertyResult(name=name, passed=check.passed, detail=check.detail))
+    return property_results

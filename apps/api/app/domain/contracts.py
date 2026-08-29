@@ -139,3 +139,22 @@ class CodeContext(BaseModel):
     source: str
     files: list[CodeFile]
     excluded_files: list[str]
+
+
+class PropertySpec(BaseModel):
+    """A declarative property selection -- never executable code (§3.1).
+
+    Only ``property`` names present in `app.domain.properties`'s catalog
+    are meaningful; unrecognized names fail evaluation rather than
+    silently passing or running arbitrary code.
+    """
+
+    function: str = Field(min_length=1)
+    property: str = Field(min_length=1)
+    oracle: str = Field(min_length=1)
+    arguments: list[str] = Field(default_factory=list)
+
+
+class PropertyCheckResult(BaseModel):
+    passed: bool
+    detail: str

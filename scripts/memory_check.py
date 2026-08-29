@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 import sqlite3
 import sys
 from pathlib import Path
@@ -12,15 +13,25 @@ CACHE = ROOT / ".cache" / "memory-index.sqlite"
 REQUIRED_HEADINGS = {
     "episodic": ["Goal", "Changed files", "Validation evidence", "Blocker", "Owner", "Next action"],
 }
-FORBIDDEN_MARKERS = ("@utah.edu", "unid", "student id", "api_key", "sk-", "password")
+FORBIDDEN_MARKERS = ("@utah.edu", "unid", "student id", "api_key", "password")
+# API-key-shaped tokens only (e.g. sk-abc123...), not ordinary hyphenated
+# words like "risk-register" -- word boundary before "sk-", then key-shaped
+# characters after it.
+FORBIDDEN_PATTERNS = (re.compile(r"\bsk-[a-z0-9]"),)
 
 
 def validate(path: Path) -> list[str]:
     text = path.read_text(encoding="utf-8")
+    lowered = text.lower()
     errors = [
         f"{path.relative_to(ROOT)} contains a forbidden marker: {marker}"
         for marker in FORBIDDEN_MARKERS
-        if marker in text.lower()
+        if marker in lowered
+    ]
+    errors += [
+        f"{path.relative_to(ROOT)} contains a forbidden marker: {pattern.pattern}"
+        for pattern in FORBIDDEN_PATTERNS
+        if pattern.search(lowered)
     ]
     category = path.parent.name
     for heading in REQUIRED_HEADINGS.get(category, []):
