@@ -178,7 +178,7 @@ Spec-first tasks referencing a phase/task ID here; verify SDK/API usage against 
 | R7 | Practice-selection heuristic (was BKT cold start) | 2 | Simpler heuristic, no calibration claim being made | Reduced |
 | R8 | Timeline: ambitious scope kept in full | all | Resequenced risk-first (Phase 1 spikes) so a hard blocker surfaces early | Open — needs team timeline sanity-check |
 | R9 | Agent-generated slop | all | Spec-first tasks, mandatory tests, human review, PR checklist | Process in place |
-| R10 | Sandbox build is real, non-trivial infrastructure | 1, 2 | Phase 1 spike proves the minimal version first; scope to exactly what verification needs | Open |
+| R10 | Sandbox build is real, non-trivial infrastructure | 1, 2 | Phase 1 spike proves the minimal version first; scope to exactly what verification needs | Spike passed (`apps/api/app/domain/sandbox.py`); production-grade container/VM isolation still open for Phase 2 |
 | R11 | UofU workspace admin approval may not be obtainable before the hackathon | 1 | Explicit Phase 1 spike; fallback decided in advance | Open — highest-priority unknown |
 
 ---
