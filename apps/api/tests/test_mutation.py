@@ -12,6 +12,7 @@ from app.domain.mutation import generate_comparison_mutants
 from app.domain.sandbox import FIXTURES_ROOT, execute_repair
 
 BFS_SOURCE = (FIXTURES_ROOT / "repos" / "public-graph-traversal" / "bfs.py").read_text(encoding="utf-8")
+BINARY_SEARCH_SOURCE = (FIXTURES_ROOT / "repos" / "public-search" / "binary_search.py").read_text(encoding="utf-8")
 
 
 def test_generates_at_least_one_mutant_for_bfs_source() -> None:
@@ -57,3 +58,24 @@ def test_unmutated_reference_source_passes_as_known_good() -> None:
 
     assert record.status.value == "completed"
     assert all(result.passed for result in record.property_results)
+
+
+def test_operator_generates_multiple_mutants_for_a_structurally_different_challenge() -> None:
+    """Proves the operator itself generalizes: binary_search has three
+    comparisons of different kinds (==, <, <=), none of which are `in`/
+    `not in` like bfs's one comparison."""
+    mutants = generate_comparison_mutants(BINARY_SEARCH_SOURCE)
+
+    assert len(mutants) >= 3
+
+
+def test_at_least_one_binary_search_mutant_is_killed_by_the_real_pipeline() -> None:
+    mutants = generate_comparison_mutants(BINARY_SEARCH_SOURCE)
+
+    killed = []
+    for mutant in mutants:
+        record = execute_repair(challenge_id="binary-search-invariant-01", repair_source=mutant.mutated_source)
+        if record.status.value == "completed" and any(not r.passed for r in record.property_results):
+            killed.append(mutant)
+
+    assert killed, "expected at least one binary_search mutant to be killed by the existing property"

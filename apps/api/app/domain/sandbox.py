@@ -11,6 +11,7 @@ of this PoC, not a claim of production-grade isolation.
 from __future__ import annotations
 
 import ast
+import copy
 import hashlib
 import hmac
 import json
@@ -57,10 +58,16 @@ _TIMEOUT_SECONDS = 5
 _CPU_SECONDS = 2
 _ADDRESS_SPACE_BYTES = 768 * 1024 * 1024
 
-_HIDDEN_TEST_INPUTS: list[dict[str, Any]] = [
+_BFS_TEST_INPUTS: list[dict[str, Any]] = [
     {"graph": {"A": ["B", "C"], "B": ["D"], "C": ["D"], "D": ["A"]}, "start": "A"},
     {"graph": {"A": ["B"], "B": ["A"]}, "start": "A"},
     {"graph": {"A": []}, "start": "A"},
+]
+
+_BINARY_SEARCH_TEST_INPUTS: list[dict[str, Any]] = [
+    {"sorted_values": [1, 3, 5, 7, 9], "target": 7},
+    {"sorted_values": [5], "target": 5},
+    {"sorted_values": [1, 2, 3, 4, 5], "target": 10},
 ]
 
 
@@ -68,6 +75,9 @@ _HIDDEN_TEST_INPUTS: list[dict[str, Any]] = [
 class ChallengeConfig:
     entry_point: str
     oracle_path: Path
+    # Each entry is passed to the entry point as **kwargs -- generic across
+    # any function signature, not tied to any one challenge's argument
+    # names (see test_sandbox_generalization.py).
     test_inputs: list[dict[str, Any]]
     property_spec: PropertySpec
 
@@ -76,9 +86,19 @@ _CHALLENGES: dict[str, ChallengeConfig] = {
     "traversal-invariant-02": ChallengeConfig(
         entry_point="bfs",
         oracle_path=FIXTURES_ROOT / "repos" / "public-graph-traversal" / "bfs.py",
-        test_inputs=_HIDDEN_TEST_INPUTS,
+        test_inputs=_BFS_TEST_INPUTS,
         property_spec=PropertySpec(
             function="bfs",
+            property="output_equals_reference",
+            oracle="reference_implementation_v1",
+        ),
+    ),
+    "binary-search-invariant-01": ChallengeConfig(
+        entry_point="binary_search",
+        oracle_path=FIXTURES_ROOT / "repos" / "public-search" / "binary_search.py",
+        test_inputs=_BINARY_SEARCH_TEST_INPUTS,
+        property_spec=PropertySpec(
+            function="binary_search",
             property="output_equals_reference",
             oracle="reference_implementation_v1",
         ),
@@ -91,12 +111,14 @@ def _run_oracle(config: ChallengeConfig, case: dict[str, Any]) -> Any:
 
     This is our own reviewed fixture source, not student input -- the
     sandbox boundary exists for the submitted repair, not for code we
-    wrote and control.
+    wrote and control. Deep-copies the case before calling in case the
+    reference implementation ever mutates an argument in place; the
+    shared `test_inputs` list must stay unmodified across calls.
     """
     namespace: dict[str, Any] = {}
     exec(config.oracle_path.read_text(encoding="utf-8"), namespace)  # noqa: S102 - trusted, reviewed fixture source
     entry_point = namespace[config.entry_point]
-    return entry_point(dict(case["graph"]), case["start"])
+    return entry_point(**copy.deepcopy(case))
 
 
 class ExecutionStatus(StrEnum):
@@ -173,7 +195,7 @@ cases = {cases}
 results = []
 for case in cases:
     try:
-        output = {entry_point}(dict(case["graph"]), case["start"])
+        output = {entry_point}(**case)
         results.append({{"ok": True, "output": output}})
     except Exception as error:  # noqa: BLE001 - reporting to parent, not swallowing
         results.append({{"ok": False, "error": f"raised {{type(error).__name__}}: {{error}}"}})
