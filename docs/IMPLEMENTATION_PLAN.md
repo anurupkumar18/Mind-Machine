@@ -173,7 +173,7 @@ Spec-first tasks referencing a phase/task ID here; verify SDK/API usage against 
 | R2 | Content-generation quality on the property-DSL catalog | 2, 7 | Catalog is human-reviewed and narrow by design, lower risk than free-form hypothesis generation | Open, reduced |
 | R3 | ~~Remote-execution trust boundary~~ | — | **Resolved** — verification is server-side and signed (I8) | Resolved |
 | R4 | Judges likely lack a UofU seat | 9 | Live screen-share demo, no public fallback | Accepted |
-| R5 | Canvas institutional approval lead time | 1, 4 | Explicit Phase 1 blocking spike, needs a named owner | Open — needs an owner named |
+| R5 | Canvas institutional approval lead time | 1, 4 | Explicit Phase 1 blocking spike, needs a named owner | Open — needs an owner named. Confirmed blocked: UofU Canvas admins have disabled self-service access tokens (a UofU admin must generate one on request); Instructure's public trial instance is discontinued. Both self-service paths are dead ends; only a direct UofU Canvas-admin contact remains |
 | R6 | ChatGPT Apps SDK is a newer, preview surface | 5 | Budget slack; Codex plugin as a working fallback | Open; MCP server itself now proven reachable over streamable-http (`docs/MCP_SERVER.md`), a public HTTPS endpoint and workspace approval remain open |
 | R7 | Practice-selection heuristic (was BKT cold start) | 2 | Simpler heuristic, no calibration claim being made | Reduced |
 | R8 | Timeline: ambitious scope kept in full | all | Resequenced risk-first (Phase 1 spikes) so a hard blocker surfaces early | Open — needs team timeline sanity-check |
