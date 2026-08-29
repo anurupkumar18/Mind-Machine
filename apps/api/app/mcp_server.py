@@ -24,6 +24,8 @@ from app.domain.canvas_mock import mock_course_context
 from app.domain.challenge_token import InvalidTokenError, issue_token, verify_token
 from app.domain.contracts import CourseTopicsResponse, DiagnosisRequest
 from app.domain.fixtures import fixture_data
+from app.domain.ingestion import ingest_material
+from app.domain.retrieval import keyword_search
 from app.domain.runtime import canonical_next_frontier
 from app.domain.sandbox import execute_repair
 from app.domain.socratic import diagnose
@@ -31,6 +33,18 @@ from app.domain.topic_matching import (
     NoMatchingChallengeError,
     match_topics,
     resolve_challenge_for_topic,
+)
+from app.domain.workspace_store import (
+    UnknownMaterialError,
+    UnknownWorkspaceError,
+    all_chunks,
+    list_materials,
+)
+from app.domain.workspace_store import (
+    delete_workspace as delete_workspace_chunks,
+)
+from app.domain.workspace_store import (
+    remove_material as remove_material_chunks,
 )
 
 KNOWN_CHALLENGES = {"traversal-invariant-02"}
@@ -45,7 +59,12 @@ mcp = MCPServer(
         "start_challenge with either a challenge_id or a topic to begin; it "
         "returns a challenge_token to pass to every subsequent tool call. "
         "Evidence comes from Evidence Engine's own execution, never from "
-        "this tool's caller."
+        "this tool's caller. Separately, a student study workspace lets a "
+        "student add their own course materials (add_course_material), "
+        "review or remove them (list_workspace_materials, remove_material, "
+        "delete_workspace), and ask questions about them "
+        "(answer_from_materials) -- this workspace answers directly, "
+        "unlike the non-evaluative code-repair coaching above."
     ),
 )
 
@@ -156,6 +175,94 @@ def submit_repair(challenge_token: str, repair_source: str) -> dict[str, Any]:
     payload["status"] = record.status.value
     payload["trace"] = {"stage": "verifier", "tool": "submit_repair"}
     return payload
+
+
+@mcp.tool()
+def add_course_material(workspace_id: str, filename: str, text: str) -> dict[str, Any]:
+    """Ingest one uploaded study material into a student's workspace.
+
+    Part of the student study workspace capability -- distinct from the
+    code-repair coaching tools above; see
+    docs/superpowers/specs/2026-08-29-student-study-workspace-design.md.
+
+    Takes already-extracted plain text, not a raw file. How ChatGPT/Codex
+    actually deliver attachment content to a tool call is unverified
+    against a real host session -- this is the design's best-guess shape,
+    matching this repo's existing practice of shipping a spike's
+    engineering half before its institutional/connectivity half is
+    confirmed (see docs/MCP_SERVER.md).
+    """
+    result = ingest_material(workspace_id=workspace_id, filename=filename, text=text)
+    payload = result.model_dump()
+    payload["trace"] = {"stage": "workspace", "tool": "add_course_material"}
+    return payload
+
+
+@mcp.tool()
+def list_workspace_materials(workspace_id: str) -> dict[str, Any]:
+    """List the materials currently stored in a study workspace."""
+    materials = list_materials(workspace_id)
+    return {
+        "workspace_id": workspace_id,
+        "materials": [m.model_dump() for m in materials],
+        "trace": {"stage": "workspace", "tool": "list_workspace_materials"},
+    }
+
+
+@mcp.tool()
+def remove_material(workspace_id: str, filename: str) -> dict[str, Any]:
+    """Delete one material from a study workspace."""
+    try:
+        remove_material_chunks(workspace_id=workspace_id, filename=filename)
+    except UnknownMaterialError as error:
+        raise ValueError(str(error)) from error
+    return {
+        "workspace_id": workspace_id,
+        "filename": filename,
+        "deleted": True,
+        "trace": {"stage": "workspace", "tool": "remove_material"},
+    }
+
+
+@mcp.tool()
+def delete_workspace(workspace_id: str) -> dict[str, Any]:
+    """Delete an entire study workspace and everything stored in it."""
+    try:
+        delete_workspace_chunks(workspace_id)
+    except UnknownWorkspaceError as error:
+        raise ValueError(str(error)) from error
+    return {
+        "workspace_id": workspace_id,
+        "deleted": True,
+        "trace": {"stage": "workspace", "tool": "delete_workspace"},
+    }
+
+
+@mcp.tool()
+def answer_from_materials(workspace_id: str, question: str) -> dict[str, Any]:
+    """Retrieve cited excerpts from a workspace's materials for a question.
+
+    Returns excerpts only -- the host model synthesizes the actual answer
+    and must cite filename/location for each excerpt it uses; no
+    inference happens in this tool.
+    """
+    if not all_chunks(workspace_id):
+        return {
+            "workspace_id": workspace_id,
+            "question": question,
+            "excerpts": [],
+            "status": "no_materials",
+            "trace": {"stage": "workspace", "tool": "answer_from_materials"},
+        }
+
+    excerpts = keyword_search(workspace_id=workspace_id, question=question)
+    return {
+        "workspace_id": workspace_id,
+        "question": question,
+        "excerpts": [e.model_dump() for e in excerpts],
+        "status": "no_match" if not excerpts else "ok",
+        "trace": {"stage": "workspace", "tool": "answer_from_materials"},
+    }
 
 
 def main() -> None:

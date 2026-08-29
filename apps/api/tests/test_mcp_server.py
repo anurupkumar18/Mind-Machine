@@ -118,3 +118,110 @@ async def test_start_challenge_rejects_unmatched_topic() -> None:
         result = await session.call_tool("start_challenge", {"topic": "dynamic programming"})
 
     assert result.is_error is True
+
+
+async def test_workspace_tools_are_discoverable() -> None:
+    async with connected_client() as session:
+        tools = await session.list_tools()
+
+    names = [tool.name for tool in tools.tools]
+    for expected in (
+        "add_course_material",
+        "list_workspace_materials",
+        "remove_material",
+        "delete_workspace",
+        "answer_from_materials",
+    ):
+        assert expected in names
+
+
+async def test_add_course_material_stores_and_lists_it() -> None:
+    workspace_id = "test-ws-store-and-list"
+    async with connected_client() as session:
+        add_result = await session.call_tool(
+            "add_course_material",
+            {"workspace_id": workspace_id, "filename": "syllabus.txt", "text": "This course covers BFS and DFS."},
+        )
+        list_result = await session.call_tool("list_workspace_materials", {"workspace_id": workspace_id})
+
+    assert add_result.is_error is not True
+    add_payload = json.loads(add_result.content[0].text)  # type: ignore[union-attr]
+    assert add_payload["status"] == "stored"
+
+    assert list_result.is_error is not True
+    list_payload = json.loads(list_result.content[0].text)  # type: ignore[union-attr]
+    assert [m["filename"] for m in list_payload["materials"]] == ["syllabus.txt"]
+
+
+async def test_add_course_material_rejects_graded_submission_content() -> None:
+    workspace_id = "test-ws-reject"
+    async with connected_client() as session:
+        result = await session.call_tool(
+            "add_course_material",
+            {"workspace_id": workspace_id, "filename": "hw_submission.txt", "text": "My work."},
+        )
+
+    assert result.is_error is not True
+    payload = json.loads(result.content[0].text)  # type: ignore[union-attr]
+    assert payload["status"] == "rejected"
+
+
+async def test_answer_from_materials_reports_no_materials_for_empty_workspace() -> None:
+    async with connected_client() as session:
+        result = await session.call_tool(
+            "answer_from_materials", {"workspace_id": "test-ws-never-used", "question": "anything?"}
+        )
+
+    assert result.is_error is not True
+    payload = json.loads(result.content[0].text)  # type: ignore[union-attr]
+    assert payload["status"] == "no_materials"
+    assert payload["excerpts"] == []
+
+
+async def test_answer_from_materials_returns_cited_excerpts() -> None:
+    workspace_id = "test-ws-answer"
+    async with connected_client() as session:
+        await session.call_tool(
+            "add_course_material",
+            {
+                "workspace_id": workspace_id,
+                "filename": "notes.txt",
+                "text": "Breadth-first search marks nodes visited when they enter the frontier.",
+            },
+        )
+        result = await session.call_tool(
+            "answer_from_materials", {"workspace_id": workspace_id, "question": "when are nodes marked visited?"}
+        )
+
+    assert result.is_error is not True
+    payload = json.loads(result.content[0].text)  # type: ignore[union-attr]
+    assert payload["status"] == "ok"
+    assert payload["excerpts"][0]["filename"] == "notes.txt"
+
+
+async def test_remove_material_deletes_it_and_errors_on_unknown() -> None:
+    workspace_id = "test-ws-remove"
+    async with connected_client() as session:
+        await session.call_tool(
+            "add_course_material", {"workspace_id": workspace_id, "filename": "notes.txt", "text": "Some content."}
+        )
+        removed = await session.call_tool("remove_material", {"workspace_id": workspace_id, "filename": "notes.txt"})
+        unknown = await session.call_tool(
+            "remove_material", {"workspace_id": workspace_id, "filename": "does-not-exist.txt"}
+        )
+
+    assert removed.is_error is not True
+    assert unknown.is_error is True
+
+
+async def test_delete_workspace_deletes_it_and_errors_on_unknown() -> None:
+    workspace_id = "test-ws-delete"
+    async with connected_client() as session:
+        await session.call_tool(
+            "add_course_material", {"workspace_id": workspace_id, "filename": "notes.txt", "text": "Some content."}
+        )
+        deleted = await session.call_tool("delete_workspace", {"workspace_id": workspace_id})
+        unknown = await session.call_tool("delete_workspace", {"workspace_id": workspace_id})
+
+    assert deleted.is_error is not True
+    assert unknown.is_error is True
