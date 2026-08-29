@@ -18,7 +18,7 @@
 - Create: `fixtures/canvas/course.json`
 - Modify: `apps/api/app/domain/contracts.py` (append at end of file)
 
-- [ ] **Step 1: Create the fixture directory and file**
+- [x] **Step 1: Create the fixture directory and file**
 
 Create `fixtures/canvas/course.json`:
 
@@ -39,7 +39,7 @@ Create `fixtures/canvas/course.json`:
 }
 ```
 
-- [ ] **Step 2: Append the new contracts**
+- [x] **Step 2: Append the new contracts**
 
 At the end of `apps/api/app/domain/contracts.py`, add:
 
@@ -69,12 +69,12 @@ class CourseTopicsResponse(BaseModel):
     topics: list[TopicMatch]
 ```
 
-- [ ] **Step 3: Typecheck**
+- [x] **Step 3: Typecheck**
 
 Run: `cd apps/api && uv run mypy app`
 Expected: `Success: no issues found`
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add fixtures/canvas/course.json apps/api/app/domain/contracts.py
@@ -89,7 +89,7 @@ git commit -m "Add mock Canvas course fixture and Canvas/topic-match contracts"
 - Create: `apps/api/app/domain/canvas_mock.py`
 - Test: `apps/api/tests/test_canvas_mock.py`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Create `apps/api/tests/test_canvas_mock.py`:
 
@@ -134,12 +134,12 @@ def test_mock_course_context_never_includes_excluded_categories() -> None:
         assert excluded not in blob
 ```
 
-- [ ] **Step 2: Run the tests to verify they fail**
+- [x] **Step 2: Run the tests to verify they fail**
 
 Run: `cd apps/api && uv run pytest tests/test_canvas_mock.py -v`
 Expected: FAIL — `ModuleNotFoundError: No module named 'app.domain.canvas_mock'`
 
-- [ ] **Step 3: Write the implementation**
+- [x] **Step 3: Write the implementation**
 
 Create `apps/api/app/domain/canvas_mock.py`:
 
@@ -177,17 +177,17 @@ def mock_course_context() -> CanvasCourseContext:
     )
 ```
 
-- [ ] **Step 4: Run the tests to verify they pass**
+- [x] **Step 4: Run the tests to verify they pass**
 
 Run: `cd apps/api && uv run pytest tests/test_canvas_mock.py -v`
 Expected: 3 passed
 
-- [ ] **Step 5: Typecheck and lint**
+- [x] **Step 5: Typecheck and lint**
 
 Run: `cd apps/api && uv run mypy app && uv run ruff check .`
 Expected: both clean
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add apps/api/app/domain/canvas_mock.py apps/api/tests/test_canvas_mock.py
@@ -202,7 +202,7 @@ git commit -m "Add mock Canvas client (fixture-backed, I4 stand-in for Phase 4)"
 - Create: `apps/api/app/domain/topic_matching.py`
 - Test: `apps/api/tests/test_topic_matching.py`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Create `apps/api/tests/test_topic_matching.py`:
 
@@ -272,12 +272,12 @@ def test_resolve_challenge_for_topic_raises_when_nothing_matches() -> None:
         resolve_challenge_for_topic("dynamic programming")
 ```
 
-- [ ] **Step 2: Run the tests to verify they fail**
+- [x] **Step 2: Run the tests to verify they fail**
 
 Run: `cd apps/api && uv run pytest tests/test_topic_matching.py -v`
 Expected: FAIL — `ModuleNotFoundError: No module named 'app.domain.topic_matching'`
 
-- [ ] **Step 3: Write the implementation**
+- [x] **Step 3: Write the implementation**
 
 Create `apps/api/app/domain/topic_matching.py`:
 
@@ -334,17 +334,17 @@ def resolve_challenge_for_topic(topic: str) -> str:
     raise NoMatchingChallengeError(f"No challenge matches topic: {topic!r}")
 ```
 
-- [ ] **Step 4: Run the tests to verify they pass**
+- [x] **Step 4: Run the tests to verify they pass**
 
 Run: `cd apps/api && uv run pytest tests/test_topic_matching.py -v`
 Expected: 5 passed
 
-- [ ] **Step 5: Typecheck and lint**
+- [x] **Step 5: Typecheck and lint**
 
 Run: `cd apps/api && uv run mypy app && uv run ruff check .`
 Expected: both clean
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add apps/api/app/domain/topic_matching.py apps/api/tests/test_topic_matching.py
@@ -359,7 +359,7 @@ git commit -m "Add deterministic topic-tag matcher for Canvas-grounded challenge
 - Modify: `apps/api/app/mcp_server.py`
 - Modify: `apps/api/tests/test_mcp_server.py`
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 Append to `apps/api/tests/test_mcp_server.py`:
 
@@ -417,12 +417,12 @@ async def test_start_challenge_rejects_unmatched_topic() -> None:
     assert result.is_error is True
 ```
 
-- [ ] **Step 2: Run the tests to verify they fail**
+- [x] **Step 2: Run the tests to verify they fail**
 
 Run: `cd apps/api && uv run pytest tests/test_mcp_server.py -v`
 Expected: FAIL — `list_course_topics` tool not found / `start_challenge()` rejects unexpected keyword `topic`
 
-- [ ] **Step 3: Update the imports and `KNOWN_CHALLENGES` area**
+- [x] **Step 3: Update the imports and `KNOWN_CHALLENGES` area**
 
 In `apps/api/app/mcp_server.py`, replace:
 
@@ -448,7 +448,7 @@ from app.domain.socratic import diagnose
 from app.domain.topic_matching import NoMatchingChallengeError, match_topics, resolve_challenge_for_topic
 ```
 
-- [ ] **Step 4: Replace `start_challenge` and add `list_course_topics`**
+- [x] **Step 4: Replace `start_challenge` and add `list_course_topics`**
 
 Replace the existing `start_challenge` tool:
 
@@ -526,22 +526,22 @@ def start_challenge(challenge_id: str | None = None, topic: str | None = None) -
     }
 ```
 
-- [ ] **Step 5: Run the tests to verify they pass**
+- [x] **Step 5: Run the tests to verify they pass**
 
 Run: `cd apps/api && uv run pytest tests/test_mcp_server.py -v`
 Expected: all passed (3 original + 6 new = 9)
 
-- [ ] **Step 6: Typecheck and lint**
+- [x] **Step 6: Typecheck and lint**
 
 Run: `cd apps/api && uv run mypy app && uv run ruff check .`
 Expected: both clean
 
-- [ ] **Step 7: Run the full existing suite to confirm no regression**
+- [x] **Step 7: Run the full existing suite to confirm no regression**
 
 Run: `cd apps/api && uv run pytest -q`
 Expected: all pass, no failures in `test_mcp_server_workflow.py` or `test_mcp_server_repair.py` (both call `start_challenge` with `challenge_id=` only, which is unaffected)
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 ```bash
 git add apps/api/app/mcp_server.py apps/api/tests/test_mcp_server.py
@@ -557,7 +557,7 @@ git commit -m "Add list_course_topics MCP tool and topic-based start_challenge"
 
 I7 requires any new host-facing tool to extend the shared guardrail suite before merge. `list_course_topics` and the topic-based path of `start_challenge` are new host-facing surfaces, so this task is mandatory, not optional polish.
 
-- [ ] **Step 1: Update the module docstring's tool count**
+- [x] **Step 1: Update the module docstring's tool count**
 
 In `apps/api/tests/test_guardrails.py`, replace:
 
@@ -581,7 +581,7 @@ over-helping behavioral eval set." This suite covers `start_challenge`
 design -- it's the one tool meant to carry evidence-only fields.
 ```
 
-- [ ] **Step 2: Write the failing tests**
+- [x] **Step 2: Write the failing tests**
 
 Append to `apps/api/tests/test_guardrails.py`:
 
@@ -604,17 +604,17 @@ async def test_start_challenge_via_topic_never_leaks_hidden_content() -> None:
 
 These aren't expected to fail against Task 4's implementation (there's no code path from `canvas_mock`/`topic_matching` into `sandbox.py`'s hidden-test or secret material), but running them before declaring the task done is exactly what proves that structurally, not just by absence of a counterexample.
 
-- [ ] **Step 3: Run the tests to verify they pass**
+- [x] **Step 3: Run the tests to verify they pass**
 
 Run: `cd apps/api && uv run pytest tests/test_guardrails.py -v`
 Expected: all passed (existing tests + 2 new)
 
-- [ ] **Step 4: Lint**
+- [x] **Step 4: Lint**
 
 Run: `cd apps/api && uv run ruff check .`
 Expected: clean
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add apps/api/tests/test_guardrails.py
@@ -630,7 +630,7 @@ git commit -m "Extend I6/I7 guardrail suite to cover list_course_topics and topi
 
 `docs/PROJECT_CHARTER.md` already names this file as owed "written alongside the Canvas phase." This task writes it now, documenting the mock.
 
-- [ ] **Step 1: Write the file**
+- [x] **Step 1: Write the file**
 
 Create `docs/CANVAS_INTEGRATION.md`:
 
@@ -720,7 +720,7 @@ Institutional approval unblocks a straightforward swap, not a redesign:
   separate, larger fixture-loading generalization, not part of this work).
 ```
 
-- [ ] **Step 2: Commit**
+- [x] **Step 2: Commit**
 
 ```bash
 git add docs/CANVAS_INTEGRATION.md
@@ -734,7 +734,7 @@ git commit -m "Document the mock-mode Canvas integration (owed per PROJECT_CHART
 **Files:**
 - Modify: `docs/IMPLEMENTATION_PLAN.md`
 
-- [ ] **Step 1: Add a note after the backup-ingestion-path bullets**
+- [x] **Step 1: Add a note after the backup-ingestion-path bullets**
 
 In `docs/IMPLEMENTATION_PLAN.md`, find this line (currently line 115):
 
@@ -749,7 +749,7 @@ Insert immediately after it (before the following `---`):
 **Mock-mode demo (2026-08-28, distinct from the still-blocked real integration)**: `apps/api/app/domain/canvas_mock.py` + `topic_matching.py` demonstrate the topic-grounding *shape* — Canvas module/topic titles narrowing which practice challenge a student gets — entirely against a checked-in fixture (`fixtures/canvas/course.json`), never a real Canvas connection. This does not touch or weaken the I4 gate: no code path in the mock reaches a real Canvas endpoint, and R5 below is unchanged by its existence. Full detail: `docs/CANVAS_INTEGRATION.md`.
 ```
 
-- [ ] **Step 2: Update the R5 risk-register row**
+- [x] **Step 2: Update the R5 risk-register row**
 
 Find the R5 row (search for `| R5 |`):
 
@@ -763,7 +763,7 @@ Replace with (appending one sentence to the last column, everything else unchang
 | R5 | Canvas institutional approval lead time | 1, 4 | Explicit Phase 1 blocking spike, needs a named owner | Open — needs an owner named. Confirmed blocked: UofU Canvas admins have disabled self-service access tokens (a UofU admin must generate one on request); Instructure's public trial instance is discontinued. Both self-service paths are dead ends; only a direct UofU Canvas-admin contact remains. A mock-mode demo of the topic-grounding shape now exists (`docs/CANVAS_INTEGRATION.md`) — distinct from, and no substitute for, resolving this row |
 ```
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add docs/IMPLEMENTATION_PLAN.md
@@ -780,7 +780,7 @@ git commit -m "Note the mock-mode Canvas demo in the implementation plan (§4, R
 
 The latest existing episodic file is `memory/episodic/0027-content-selection-policy.md`, so this is `0028`. Re-check `ls memory/episodic/` immediately before creating the file in case another session has added entries since this plan was written, and adjust the number if so.
 
-- [ ] **Step 1: Write the episodic entry**
+- [x] **Step 1: Write the episodic entry**
 
 Create `memory/episodic/0028-canvas-mock-topic-grounding.md` (adjust the number per the check above):
 
@@ -858,7 +858,7 @@ stated next actions), add its topic tags to
 already scale to more than one challenge without further changes.
 ```
 
-- [ ] **Step 2: Update `memory/INDEX.md`**
+- [x] **Step 2: Update `memory/INDEX.md`**
 
 Replace the "Current handoff" line at the end of the file:
 
@@ -883,12 +883,12 @@ Canvas connection) now exists — `apps/api/app/domain/canvas_mock.py`,
 substitute for, the still-blocked real integration.
 ```
 
-- [ ] **Step 3: Run the memory checker**
+- [x] **Step 3: Run the memory checker**
 
 Run: `python3 scripts/memory_check.py`
 Expected: `Validated N memory documents and rebuilt .cache/memory-index.sqlite` (exit 0, no forbidden-marker or missing-heading errors, and no stale-pointer error)
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add memory/episodic/ memory/INDEX.md
@@ -901,16 +901,16 @@ git commit -m "Record mock-mode Canvas topic-grounding in memory"
 
 **Files:** none (verification only)
 
-- [ ] **Step 1: Run the full project check**
+- [x] **Step 1: Run the full project check**
 
 Run: `make check`
 Expected: `memory-check`, both lints, both typechecks, full API + web test suites, and smoke all pass with no failures.
 
-- [ ] **Step 2: Manually exercise the new tools over the real stdio transport**
+- [x] **Step 2: Manually exercise the new tools over the real stdio transport**
 
 Run: `cd apps/api && uv run python3 -m app.mcp_server` in one terminal (leave it running), then in another terminal use any MCP-capable client (or the existing in-memory test pattern is sufficient evidence — this step is optional if Task 4/5's tests already exercise the real MCP protocol layer, which they do via `mcp.shared.memory`). Skip this step if short on time; Task 4/5's automated tests already prove protocol-level correctness.
 
-- [ ] **Step 3: Confirm the episodic entry's validation-evidence claim is accurate**
+- [x] **Step 3: Confirm the episodic entry's validation-evidence claim is accurate**
 
 Re-read the "Validation evidence" section of `memory/episodic/0028-canvas-
 mock-topic-grounding.md` (Task 8) against Step 1's actual `make check`
