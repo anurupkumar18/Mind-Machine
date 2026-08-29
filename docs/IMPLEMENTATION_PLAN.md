@@ -171,7 +171,7 @@ Spec-first tasks referencing a phase/task ID here; verify SDK/API usage against 
 
 | ID | Risk | Phase | Mitigation | Status |
 |---|---|---|---|---|
-| R1 | Kill-ratio tuning still genuinely hard | 2 | Real iteration before the hackathon; curated fixtures as fallback | Open — AST mutation-operator library not started yet |
+| R1 | Kill-ratio tuning still genuinely hard | 2 | Real iteration before the hackathon; curated fixtures as fallback | Open, first operator built: `app.domain.mutation` implements comparison-operator replacement (Eq/NotEq/Lt/GtE/Gt/LtE/In/NotIn/Is/IsNot), generic across any source, verified to actually classify correctly through the real sandbox+property pipeline for the one comparison in the traversal-invariant-02 reference implementation. Only one operator type exists; kill-ratio *tuning* and equivalent-mutant tolerance are still unaddressed — see `memory/episodic/0020-*.md` |
 | R2 | Content-generation quality on the property-DSL catalog | 2, 7 | Catalog is human-reviewed and narrow by design, lower risk than free-form hypothesis generation | Open, reduced. First slice built: `app.domain.properties` implements `output_equals_reference` and `output_is_permutation` against a reference-oracle execution model (not hand-authored expected values) — see `memory/episodic/0019-*.md` |
 | R3 | ~~Remote-execution trust boundary~~ | — | **Resolved** — verification is server-side and signed (I8) | Resolved |
 | R4 | Judges likely lack a UofU seat | 9 | Live screen-share demo, no public fallback | Accepted |
