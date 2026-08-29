@@ -174,7 +174,7 @@ Spec-first tasks referencing a phase/task ID here; verify SDK/API usage against 
 | R3 | ~~Remote-execution trust boundary~~ | — | **Resolved** — verification is server-side and signed (I8) | Resolved |
 | R4 | Judges likely lack a UofU seat | 9 | Live screen-share demo, no public fallback | Accepted |
 | R5 | Canvas institutional approval lead time | 1, 4 | Explicit Phase 1 blocking spike, needs a named owner | Open — needs an owner named |
-| R6 | ChatGPT Apps SDK is a newer, preview surface | 5 | Budget slack; Codex plugin as a working fallback | Open |
+| R6 | ChatGPT Apps SDK is a newer, preview surface | 5 | Budget slack; Codex plugin as a working fallback | Open; MCP server itself now proven reachable over streamable-http (`docs/MCP_SERVER.md`), a public HTTPS endpoint and workspace approval remain open |
 | R7 | Practice-selection heuristic (was BKT cold start) | 2 | Simpler heuristic, no calibration claim being made | Reduced |
 | R8 | Timeline: ambitious scope kept in full | all | Resequenced risk-first (Phase 1 spikes) so a hard blocker surfaces early | Open — needs team timeline sanity-check |
 | R9 | Agent-generated slop | all | Spec-first tasks, mandatory tests, human review, PR checklist | Process in place |
