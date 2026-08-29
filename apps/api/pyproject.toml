@@ -25,6 +25,9 @@ pythonpath = ["."]
 [tool.ruff]
 line-length = 100
 
+[tool.ruff.lint.isort]
+combine-as-imports = true
+
 [tool.mypy]
 strict = true
 packages = ["app"]

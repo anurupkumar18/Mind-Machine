@@ -38,12 +38,8 @@ from app.domain.workspace_store import (
     UnknownMaterialError,
     UnknownWorkspaceError,
     all_chunks,
-    list_materials,
-)
-from app.domain.workspace_store import (
     delete_workspace as delete_workspace_chunks,
-)
-from app.domain.workspace_store import (
+    list_materials,
     remove_material as remove_material_chunks,
 )
 
@@ -63,8 +59,9 @@ mcp = MCPServer(
         "student add their own course materials (add_course_material), "
         "review or remove them (list_workspace_materials, remove_material, "
         "delete_workspace), and ask questions about them "
-        "(answer_from_materials) -- this workspace answers directly, "
-        "unlike the non-evaluative code-repair coaching above."
+        "(answer_from_materials) -- this workspace enables direct answers "
+        "(from cited excerpts), unlike the non-evaluative code-repair "
+        "coaching above."
     ),
 )
 

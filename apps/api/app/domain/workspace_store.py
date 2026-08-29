@@ -5,6 +5,16 @@ database -- data does not survive a process restart. Matches this
 project's existing MVP conventions (no database anywhere yet); a real
 persistence layer is future work once this capability is validated, not
 a redesign of what's here. See docs/STUDY_WORKSPACE.md.
+
+Known limitation, stated explicitly: `workspace_id` is an unvalidated,
+caller-supplied string with no ownership check and no unguessability
+guarantee -- unlike `challenge_token` (see `challenge_token.py`), which is
+cryptographically signed. Anyone who obtains a workspace_id currently has
+full read and destructive access to it (listing, querying, removing
+materials, and deleting the whole workspace). A capability-token-style
+scheme mirroring `challenge_token.py`'s signed-token pattern is the
+natural fix, but it is deferred as explicit future work and is not part
+of this slice.
 """
 
 from __future__ import annotations
