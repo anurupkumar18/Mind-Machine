@@ -40,10 +40,12 @@ mcp = MCPServer(
     version="0.1.0",
     instructions=(
         "Evidence Engine issues verified code-reasoning practice challenges. "
-        "Call start_challenge with a challenge_id to begin; it returns a "
-        "challenge_token to pass to every subsequent tool call. Evidence "
-        "comes from Evidence Engine's own execution, never from this tool's "
-        "caller."
+        "Optionally call list_course_topics first to see what the (mock) "
+        "connected course covers and get a matching topic. Call "
+        "start_challenge with either a challenge_id or a topic to begin; it "
+        "returns a challenge_token to pass to every subsequent tool call. "
+        "Evidence comes from Evidence Engine's own execution, never from "
+        "this tool's caller."
     ),
 )
 
