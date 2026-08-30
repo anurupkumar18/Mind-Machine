@@ -31,11 +31,37 @@ def _uv_available() -> bool:
     return shutil.which("uv") is not None
 
 
+# Parameters expected to hold multi-line content (source code, prose).
+# input() only ever reads one line, so pasting multi-line text into it
+# spills the remaining lines into whatever's read next -- the main menu
+# prompt, in practice, producing a flood of "Not a valid choice." These
+# fields collect lines until an explicit EOF marker instead.
+_MULTILINE_PARAMS = {"text", "repair_source", "diagnosis"}
+
+
+def _prompt_multiline() -> str:
+    print("    (paste your value; finish with a line containing only EOF)")
+    lines: list[str] = []
+    while True:
+        try:
+            line = input()
+        except EOFError:
+            break
+        if line.strip() == "EOF":
+            break
+        lines.append(line)
+    return "\n".join(lines)
+
+
 def _prompt_json_value(param_name: str) -> object:
     """Prompt for one tool argument. Accepts JSON (numbers, strings,
     lists) or falls back to a plain string if it doesn't parse as JSON --
     so typing  graph traversal  works without needing quotes, but typing
     ["B", "C"]  also works for list-shaped arguments."""
+    if param_name in _MULTILINE_PARAMS:
+        raw = _prompt_multiline().strip()
+        return raw if raw else None
+
     raw = input(f"    {param_name} = ").strip()
     if raw == "":
         return None
