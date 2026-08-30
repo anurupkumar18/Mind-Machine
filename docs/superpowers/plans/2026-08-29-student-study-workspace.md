@@ -19,7 +19,7 @@
 **Files:**
 - Create: `apps/api/app/domain/workspace_contracts.py`
 
-- [ ] **Step 1: Write the file**
+- [x] **Step 1: Write the file**
 
 Create `apps/api/app/domain/workspace_contracts.py`:
 
@@ -66,12 +66,12 @@ class RetrievedExcerpt(BaseModel):
     score: float
 ```
 
-- [ ] **Step 2: Typecheck**
+- [x] **Step 2: Typecheck**
 
 Run: `cd apps/api && uv run mypy app`
 Expected: `Success: no issues found`
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add apps/api/app/domain/workspace_contracts.py
@@ -88,7 +88,7 @@ git commit -m "Add contracts for the student study workspace capability"
 - Create: `apps/api/app/domain/chunking.py`
 - Test: `apps/api/tests/test_chunking.py`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Create `apps/api/tests/test_chunking.py`:
 
@@ -138,12 +138,12 @@ def test_chunk_with_provenance_strips_surrounding_whitespace() -> None:
     assert chunks[0].text == "padded"
 ```
 
-- [ ] **Step 2: Run the tests to verify they fail**
+- [x] **Step 2: Run the tests to verify they fail**
 
 Run: `cd apps/api && uv run pytest tests/test_chunking.py -v`
 Expected: FAIL — `ModuleNotFoundError: No module named 'app.domain.chunking'`
 
-- [ ] **Step 3: Write the implementation**
+- [x] **Step 3: Write the implementation**
 
 Create `apps/api/app/domain/chunking.py`:
 
@@ -183,17 +183,17 @@ def chunk_with_provenance(*, workspace_id: str, filename: str, text: str) -> lis
     return chunks
 ```
 
-- [ ] **Step 4: Run the tests to verify they pass**
+- [x] **Step 4: Run the tests to verify they pass**
 
 Run: `cd apps/api && uv run pytest tests/test_chunking.py -v`
 Expected: 4 passed
 
-- [ ] **Step 5: Typecheck and lint**
+- [x] **Step 5: Typecheck and lint**
 
 Run: `cd apps/api && uv run mypy app && uv run ruff check .`
 Expected: both clean
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add apps/api/app/domain/chunking.py apps/api/tests/test_chunking.py
@@ -208,7 +208,7 @@ git commit -m "Add provenance-tagged text chunking for study materials"
 - Create: `apps/api/app/domain/data_boundary.py`
 - Test: `apps/api/tests/test_data_boundary.py`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Create `apps/api/tests/test_data_boundary.py`:
 
@@ -296,12 +296,12 @@ def test_flags_reply_marker_content() -> None:
     assert reason is not None
 ```
 
-- [ ] **Step 2: Run the tests to verify they fail**
+- [x] **Step 2: Run the tests to verify they fail**
 
 Run: `cd apps/api && uv run pytest tests/test_data_boundary.py -v`
 Expected: FAIL — `ModuleNotFoundError: No module named 'app.domain.data_boundary'`
 
-- [ ] **Step 3: Write the implementation**
+- [x] **Step 3: Write the implementation**
 
 Create `apps/api/app/domain/data_boundary.py`:
 
@@ -358,17 +358,17 @@ def classify_for_data_boundary(filename: str, text: str) -> tuple[DataBoundarySt
     return "allow", None
 ```
 
-- [ ] **Step 4: Run the tests to verify they pass**
+- [x] **Step 4: Run the tests to verify they pass**
 
 Run: `cd apps/api && uv run pytest tests/test_data_boundary.py -v`
 Expected: 9 passed
 
-- [ ] **Step 5: Typecheck and lint**
+- [x] **Step 5: Typecheck and lint**
 
 Run: `cd apps/api && uv run mypy app && uv run ruff check .`
 Expected: both clean
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add apps/api/app/domain/data_boundary.py apps/api/tests/test_data_boundary.py
@@ -383,7 +383,7 @@ git commit -m "Add heuristic I1 data-boundary classifier for uploaded materials"
 - Create: `apps/api/app/domain/workspace_store.py`
 - Test: `apps/api/tests/test_workspace_store.py`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Create `apps/api/tests/test_workspace_store.py`:
 
@@ -473,12 +473,12 @@ def test_delete_workspace_on_unknown_workspace_raises() -> None:
         delete_workspace(_workspace_id())
 ```
 
-- [ ] **Step 2: Run the tests to verify they fail**
+- [x] **Step 2: Run the tests to verify they fail**
 
 Run: `cd apps/api && uv run pytest tests/test_workspace_store.py -v`
 Expected: FAIL — `ModuleNotFoundError: No module named 'app.domain.workspace_store'`
 
-- [ ] **Step 3: Write the implementation**
+- [x] **Step 3: Write the implementation**
 
 Create `apps/api/app/domain/workspace_store.py`:
 
@@ -545,17 +545,17 @@ def delete_workspace(workspace_id: str) -> None:
     _ADDED_AT.pop(workspace_id, None)
 ```
 
-- [ ] **Step 4: Run the tests to verify they pass**
+- [x] **Step 4: Run the tests to verify they pass**
 
 Run: `cd apps/api && uv run pytest tests/test_workspace_store.py -v`
 Expected: 7 passed
 
-- [ ] **Step 5: Typecheck and lint**
+- [x] **Step 5: Typecheck and lint**
 
 Run: `cd apps/api && uv run mypy app && uv run ruff check .`
 Expected: both clean
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add apps/api/app/domain/workspace_store.py apps/api/tests/test_workspace_store.py
@@ -570,7 +570,7 @@ git commit -m "Add in-process per-workspace storage for study materials"
 - Create: `apps/api/app/domain/retrieval.py`
 - Test: `apps/api/tests/test_retrieval.py`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Create `apps/api/tests/test_retrieval.py`:
 
@@ -647,12 +647,12 @@ def test_keyword_search_respects_top_k() -> None:
     assert len(results) == 3
 ```
 
-- [ ] **Step 2: Run the tests to verify they fail**
+- [x] **Step 2: Run the tests to verify they fail**
 
 Run: `cd apps/api && uv run pytest tests/test_retrieval.py -v`
 Expected: FAIL — `ModuleNotFoundError: No module named 'app.domain.retrieval'`
 
-- [ ] **Step 3: Write the implementation**
+- [x] **Step 3: Write the implementation**
 
 Create `apps/api/app/domain/retrieval.py`:
 
@@ -702,17 +702,17 @@ def keyword_search(*, workspace_id: str, question: str, top_k: int = 5) -> list[
     ]
 ```
 
-- [ ] **Step 4: Run the tests to verify they pass**
+- [x] **Step 4: Run the tests to verify they pass**
 
 Run: `cd apps/api && uv run pytest tests/test_retrieval.py -v`
 Expected: 5 passed
 
-- [ ] **Step 5: Typecheck and lint**
+- [x] **Step 5: Typecheck and lint**
 
 Run: `cd apps/api && uv run mypy app && uv run ruff check .`
 Expected: both clean
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add apps/api/app/domain/retrieval.py apps/api/tests/test_retrieval.py
@@ -727,7 +727,7 @@ git commit -m "Add deterministic keyword-overlap retrieval for study materials"
 - Create: `apps/api/app/domain/ingestion.py`
 - Test: `apps/api/tests/test_ingestion.py`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Create `apps/api/tests/test_ingestion.py`:
 
@@ -793,12 +793,12 @@ def test_ingest_material_with_blank_text_stores_zero_chunks() -> None:
     assert result.chunk_count == 0
 ```
 
-- [ ] **Step 2: Run the tests to verify they fail**
+- [x] **Step 2: Run the tests to verify they fail**
 
 Run: `cd apps/api && uv run pytest tests/test_ingestion.py -v`
 Expected: FAIL — `ModuleNotFoundError: No module named 'app.domain.ingestion'`
 
-- [ ] **Step 3: Write the implementation**
+- [x] **Step 3: Write the implementation**
 
 Create `apps/api/app/domain/ingestion.py`:
 
@@ -836,17 +836,17 @@ def ingest_material(*, workspace_id: str, filename: str, text: str) -> IngestRes
     return IngestResult(filename=filename, chunk_count=len(chunks), status="stored", reason=None)
 ```
 
-- [ ] **Step 4: Run the tests to verify they pass**
+- [x] **Step 4: Run the tests to verify they pass**
 
 Run: `cd apps/api && uv run pytest tests/test_ingestion.py -v`
 Expected: 4 passed
 
-- [ ] **Step 5: Typecheck and lint**
+- [x] **Step 5: Typecheck and lint**
 
 Run: `cd apps/api && uv run mypy app && uv run ruff check .`
 Expected: both clean
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add apps/api/app/domain/ingestion.py apps/api/tests/test_ingestion.py
@@ -861,7 +861,7 @@ git commit -m "Add ingestion orchestrator wiring chunking, data-boundary, and st
 - Modify: `apps/api/app/mcp_server.py`
 - Modify: `apps/api/tests/test_mcp_server.py`
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 Append to `apps/api/tests/test_mcp_server.py`:
 
@@ -975,12 +975,12 @@ async def test_delete_workspace_deletes_it_and_errors_on_unknown() -> None:
     assert unknown.is_error is True
 ```
 
-- [ ] **Step 2: Run the tests to verify they fail**
+- [x] **Step 2: Run the tests to verify they fail**
 
 Run: `cd apps/api && uv run pytest tests/test_mcp_server.py -v`
 Expected: FAIL — the 5 new tool names aren't registered yet
 
-- [ ] **Step 3: Update imports**
+- [x] **Step 3: Update imports**
 
 In `apps/api/app/mcp_server.py`, replace:
 
@@ -1026,7 +1026,7 @@ from app.domain.workspace_store import (
 )
 ```
 
-- [ ] **Step 4: Update the server instructions string**
+- [x] **Step 4: Update the server instructions string**
 
 Replace:
 
@@ -1069,7 +1069,7 @@ mcp = MCPServer(
 )
 ```
 
-- [ ] **Step 5: Add the 5 new tools**
+- [x] **Step 5: Add the 5 new tools**
 
 Append these five tools to `apps/api/app/mcp_server.py`, after the existing `submit_repair` tool and before the `main()` function:
 
@@ -1162,22 +1162,22 @@ def answer_from_materials(workspace_id: str, question: str) -> dict[str, Any]:
     }
 ```
 
-- [ ] **Step 6: Run the tests to verify they pass**
+- [x] **Step 6: Run the tests to verify they pass**
 
 Run: `cd apps/api && uv run pytest tests/test_mcp_server.py -v`
 Expected: all passed (9 original + 7 new = 16)
 
-- [ ] **Step 7: Typecheck and lint**
+- [x] **Step 7: Typecheck and lint**
 
 Run: `cd apps/api && uv run mypy app && uv run ruff check .`
 Expected: both clean
 
-- [ ] **Step 8: Run the full existing suite to confirm no regression**
+- [x] **Step 8: Run the full existing suite to confirm no regression**
 
 Run: `cd apps/api && uv run pytest -q`
 Expected: all pass (119 previous + new tests from Tasks 2-7)
 
-- [ ] **Step 9: Commit**
+- [x] **Step 9: Commit**
 
 ```bash
 git add apps/api/app/mcp_server.py apps/api/tests/test_mcp_server.py
@@ -1193,7 +1193,7 @@ git commit -m "Add student study workspace MCP tools: ingest, list, remove, dele
 
 This capability's guarantee is different from the code-repair loop's I6 (which forbids direct answers). Here the guarantee is: `answer_from_materials` never fabricates a citation, and never returns another workspace's content — a real cross-student data-leak risk this project's culture would insist on testing explicitly, the same way `test_guardrails.py` sweeps for hidden-test leakage in the other capability.
 
-- [ ] **Step 1: Write the tests**
+- [x] **Step 1: Write the tests**
 
 Create `apps/api/tests/test_workspace_guardrails.py`:
 
@@ -1318,19 +1318,19 @@ async def test_removed_material_never_appears_in_later_answers() -> None:
     assert payload["excerpts"] == [], "removed material must never surface in a later answer"
 ```
 
-- [ ] **Step 2: Run the tests to verify they pass**
+- [x] **Step 2: Run the tests to verify they pass**
 
 Run: `cd apps/api && uv run pytest tests/test_workspace_guardrails.py -v`
 Expected: 3 passed
 
 These are not expected to fail against Task 7's implementation — running them is what proves the isolation/traceability guarantee structurally, the same standard `test_guardrails.py` already sets for the other capability.
 
-- [ ] **Step 3: Lint**
+- [x] **Step 3: Lint**
 
 Run: `cd apps/api && uv run ruff check .`
 Expected: clean
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add apps/api/tests/test_workspace_guardrails.py
@@ -1344,7 +1344,7 @@ git commit -m "Add guardrail suite for study-workspace citation integrity and is
 **Files:**
 - Create: `docs/STUDY_WORKSPACE.md`
 
-- [ ] **Step 1: Write the file**
+- [x] **Step 1: Write the file**
 
 Create `docs/STUDY_WORKSPACE.md`:
 
@@ -1415,7 +1415,7 @@ choose to share, distinct from either the mock Canvas topic-grounding
 demo or the still-blocked real Canvas/LTI path (R5).
 ```
 
-- [ ] **Step 2: Commit**
+- [x] **Step 2: Commit**
 
 ```bash
 git add docs/STUDY_WORKSPACE.md
@@ -1430,7 +1430,7 @@ git commit -m "Document the student study workspace capability"
 - Create: `memory/episodic/0030-student-study-workspace.md` (verify this number is still available — check `ls memory/episodic/ | tail -3` immediately before creating; the latest at plan-writing time is `0029-canvas-access-research-consent-upload-path.md`)
 - Modify: `memory/INDEX.md`
 
-- [ ] **Step 1: Write the episodic entry**
+- [x] **Step 1: Write the episodic entry**
 
 Create `memory/episodic/0030-student-study-workspace.md` (adjust the number if a higher one already exists):
 
@@ -1519,7 +1519,7 @@ Shared team.
    work — not bundled into this slice.
 ```
 
-- [ ] **Step 2: Update `memory/INDEX.md`**
+- [x] **Step 2: Update `memory/INDEX.md`**
 
 Replace the "Current handoff" line:
 
@@ -1550,12 +1550,12 @@ rewriting invariants I1/I2/I3/I5/I6 — that rewrite is the next task,
 deliberately sequenced after the product shape was built, not before.
 ```
 
-- [ ] **Step 3: Run the memory checker**
+- [x] **Step 3: Run the memory checker**
 
 Run: `python3 scripts/memory_check.py`
 Expected: `Validated N memory documents and rebuilt .cache/memory-index.sqlite`
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add memory/episodic/ memory/INDEX.md
@@ -1568,12 +1568,12 @@ git commit -m "Record student study workspace capability in memory"
 
 **Files:** none (verification only)
 
-- [ ] **Step 1: Run the full project check**
+- [x] **Step 1: Run the full project check**
 
 Run: `make check`
 Expected: `memory-check`, both lints, both typechecks, full API + web test suites, and smoke all pass with no failures.
 
-- [ ] **Step 2: Confirm the episodic entry's validation-evidence claim is accurate**
+- [x] **Step 2: Confirm the episodic entry's validation-evidence claim is accurate**
 
 Re-read the "Validation evidence" section of
 `memory/episodic/0030-student-study-workspace.md` (Task 10) against Step
