@@ -32,9 +32,19 @@ real domain logic, not stubs) and the student study workspace
   MCP protocol over in-memory streams (`mcp.shared.memory`): tool
   discovery, a successful call returning fixture-grounded data, and an
   unknown-challenge call reported as a tool error rather than a crash.
-- Manually verified end-to-end over both transports a real client would use:
-  - **stdio** (subprocess) — the transport Codex CLI's MCP client uses.
-  - **streamable-http** — the transport a hosted ChatGPT App connects to.
+- **stdio** (subprocess) — the transport Codex CLI's MCP client uses.
+  Verified against a real Codex CLI client (see "Connecting Codex CLI"),
+  not just the in-memory test harness.
+- **streamable-http** — the transport a hosted ChatGPT App connects to.
+  Verified so far only at the protocol/network level: the server, run via
+  `scripts/run_streamable_http.py` and exposed through a temporary
+  `cloudflared` tunnel, correctly answered a real MCP `initialize`
+  handshake sent from outside the machine (2026-08-30). **Not yet
+  verified**: an actual ChatGPT client (a custom connector added in
+  ChatGPT's own settings) completing that handshake and calling a tool —
+  that step needs a human to click through ChatGPT's UI, paused
+  mid-session for the night. See "Connecting a ChatGPT App" for exactly
+  where to resume.
 
 ## Running it locally
 
@@ -82,15 +92,44 @@ real Codex client, not simulated.
 
 `codex mcp remove evidence-engine` undoes the registration.
 
-## Connecting a ChatGPT App (needs a public HTTPS endpoint + UofU workspace approval)
+## Connecting a ChatGPT App (in progress, paused 2026-08-30 — resume here)
 
 ChatGPT Apps connect over streamable-http to a publicly reachable URL, not
-localhost. This needs, in order: a hosting decision (see `render.yaml` for
-the existing API deploy target), a public HTTPS URL for the `/mcp` route,
-and the UofU ChatGPT Edu/Codex workspace admin approval tracked as Phase 1
-spike 1 (§9, R11) — none of which exist yet. Until then this leg stays
-unverified against a real ChatGPT workspace, same limitation the plan
-already names.
+localhost. **A UofU institutional workspace is not actually required to
+try this as a personal custom connector** — that distinction (personal
+account vs. institutional workspace) turned out to matter here the same
+way it did for Codex CLI. What's needed for a *personal* attempt:
+
+1. Run the server over streamable-http:
+   ```bash
+   cd apps/api && uv run python3 ../../scripts/run_streamable_http.py
+   ```
+   This disables DNS-rebinding host-header protection (see the script's
+   comment) — fine for a throwaway local tunnel, not something to carry
+   into a real deployment.
+2. Expose it publicly with a temporary tunnel (no account needed):
+   ```bash
+   cloudflared tunnel --url http://127.0.0.1:8765
+   ```
+   Prints a random `https://<words>.trycloudflare.com` URL. **Confirmed
+   working 2026-08-30**: a real MCP `initialize` request sent to
+   `<tunnel-url>/mcp` from outside the machine got back this server's
+   real capabilities/instructions.
+3. **← Stopped here for the night.** The remaining step needs a human in
+   ChatGPT's own UI, not something scriptable: Settings → Connectors →
+   Advanced settings → enable Developer mode → "Add custom connector" →
+   name it, paste `<tunnel-url>/mcp` as the URL, no auth. Then in a new
+   chat, enable that connector and ask ChatGPT to call `list_course_topics`.
+4. The tunnel and local server were both stopped at the end of that
+   session (`pkill -f run_streamable_http.py`, `pkill -f "cloudflared
+   tunnel"`) — restart both (steps 1-2, a fresh random URL each time) to
+   pick this back up.
+
+Separately, and unaffected by any of the above: a **real, publicly-hosted**
+deployment (not a dev tunnel) and the UofU ChatGPT Edu/Codex workspace
+admin approval (Phase 1 spike 1, §9, R11) remain fully open — this personal
+custom-connector path proves the protocol works, not that the institutional
+distribution question is resolved.
 
 ## Known limits of this spike
 
