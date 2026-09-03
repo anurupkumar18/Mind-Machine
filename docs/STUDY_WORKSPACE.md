@@ -1,5 +1,11 @@
 # Student study workspace
 
+> **Document status:** describes a limited prototype plus an exploratory direction.
+> The existing implementation is evidence of current behavior, not proof that its
+> storage, retrieval, access model, or tool shape belongs in the future product.
+> Historical ideas and conflicts are cataloged in
+> [`research/INITIAL_RESEARCH_AND_INSPIRATION.md`](research/INITIAL_RESEARCH_AND_INSPIRATION.md).
+
 ## What this is
 
 A second, distinct Evidence Engine capability alongside the code-repair
@@ -10,6 +16,25 @@ guardrail (I6), this capability is *meant* to answer directly — see
 `docs/superpowers/specs/2026-08-29-student-study-workspace-design.md` for
 the full design and exactly which charter invariants this capability
 required rewriting (I1, I2, I3, I5, I6).
+
+## September 2026 product direction (not implemented)
+
+The team sees this prototype as the first technical slice of a broader,
+NotebookLM-style course workspace: source-grounded Q&A with citations, summaries,
+study aids, and a path from course material into personalized, verified practice.
+The intended student experience is low-setup and available through whichever
+institution-supported surface fits the course—ChatGPT, Codex, an agent, a custom
+GPT, or another approved client.
+
+The long-term direction also imagines professor- and IT-approved class packages
+that provide the right skills, guardrails, hooks, tools, plugins, and MCP servers
+when a student enrolls. No provisioning mechanism, persistence model, file
+pipeline, retrieval architecture, or open-source NotebookLM component has been
+selected. The current plain-text, in-process, keyword-retrieval implementation and
+all limitations below remain unchanged.
+
+See [`TEAM_PRODUCT_DIRECTION.md`](TEAM_PRODUCT_DIRECTION.md) for the canonical
+meeting recap and unresolved institutional questions.
 
 ## How it works
 

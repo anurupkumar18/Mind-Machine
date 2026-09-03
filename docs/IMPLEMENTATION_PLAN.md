@@ -1,5 +1,13 @@
 # Evidence Engine — Implementation Plan & Team Review Package (Revision 8)
 
+> **Document status:** dated working plan, not a permanent future specification.
+> The repository has continued to pivot since revision 8. Reconfirm every task
+> against the current charter, the latest
+> [`TEAM_PRODUCT_DIRECTION.md`](TEAM_PRODUCT_DIRECTION.md), verified source/tests,
+> and the current handoff. Earlier research is preserved for inspiration in
+> [`research/INITIAL_RESEARCH_AND_INSPIRATION.md`](research/INITIAL_RESEARCH_AND_INSPIRATION.md),
+> not as an implementation backlog.
+
 **Repo:** Mind-Machine (product name: "Evidence Engine") · **Purpose of this document:** the single reference for team review, sanity-check, and sign-off, and the source of task IDs every PR should reference (see §5.1... now §7.1 below).
 
 ---
@@ -161,6 +169,25 @@ Unchanged — still cuttable first, still requires the anonymization-can't-be-re
 ### Phase 9 — Pilot, Evaluation & Demo Readiness
 A small pilot (5-10 students/teammates); a pre/post transfer task and delayed-retention check; hint-leakage rate measured against real sessions; completion/retry rates and time-to-first-challenge; a basic usability/trust read; an explicit comparison against plain ChatGPT with no tool; then the demo rehearsal (pre-vetted topics, screen-share dry run, pitch mapped to the judging-criteria table).
 **Definition of Done**: pilot data collected and summarized; at least two full successful demo dry runs; every "why this wins" pitch claim is backed by something observed in the pilot or explicitly labeled a design rationale rather than a measured outcome.
+
+### Unscheduled discovery — institution-supported learning layer
+
+Recorded as a group product direction on 2026-09-02; **not added to the committed
+phase sequence and not approved for implementation**. The team wants to explore a
+low-setup learning environment in which enrollment could make a professor- and
+IT-approved class package available to a student: course-specific skills,
+guardrails, hooks, tools, plugins, MCP servers, and permitted context, accessed
+through ChatGPT, Codex, agents, custom GPTs, Canvas, or a companion browser
+extension. NotebookLM-style source-grounded Q&A, citations, summaries, and study
+aids would complement the verified code-practice loop.
+
+Discovery must resolve institutional provisioning, Canvas and browser-extension
+permissions, privacy and retention, support ownership, procurement, platform
+policy, accessibility, cost, course-package governance, and the boundary around
+graded work. It must also evaluate open-source components rather than assume a
+particular NotebookLM implementation. Until a reviewed follow-up changes this
+plan, the existing phases and charter invariants remain authoritative. See
+[`TEAM_PRODUCT_DIRECTION.md`](TEAM_PRODUCT_DIRECTION.md).
 
 ---
 

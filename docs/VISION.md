@@ -1,8 +1,31 @@
 # Evidence Engine — Vision
 
+> **Document status:** working product narrative spanning current capabilities and
+> future direction. It is not a complete implementation description. Where it
+> conflicts with the current charter, verified source behavior, or a later dated
+> decision, surface the discrepancy rather than silently reconciling it. Historical
+> ideas live in [`research/INITIAL_RESEARCH_AND_INSPIRATION.md`](research/INITIAL_RESEARCH_AND_INSPIRATION.md).
+
 ## One line
 
 Evidence Engine proves a student can actually reason about and repair code — not by asking an AI to grade them, but by making them predict, break, and fix real, running code and showing them evidence from tests executed in Evidence Engine's own sandbox — delivered inside the ChatGPT and Codex access University of Utah students can already get through their institutional account, and grounded in what their own Canvas course is teaching once institutional approval allows it.
+
+## September 2026 north star (direction agreed; feasibility open)
+
+The team has agreed to explore a broader destination around this verified-practice
+core: an institution-supported learning layer that gives each enrolled student a
+low-setup, course-aware AI environment. A professor- and IT-approved class package
+could make course-specific skills, guardrails, hooks, tools, plugins, and MCP
+servers available through ChatGPT, Codex, agents, or custom GPTs. Permitted Canvas
+context or a companion browser extension could connect the course, while
+NotebookLM-style source-grounded Q&A, citations, summaries, and study aids help a
+student move from understanding material to practicing it with real evidence.
+
+This is a product direction, not a claim about current functionality, permissions,
+or final architecture. Institutional provisioning, Canvas access, browser-extension
+policy, privacy, procurement, and the open-source component strategy remain open
+discovery questions. The canonical decision record is
+[`TEAM_PRODUCT_DIRECTION.md`](TEAM_PRODUCT_DIRECTION.md).
 
 ## The problem
 
@@ -14,7 +37,9 @@ A CS1/CS2-and-beyond student who wants to close the gap between "I watched it" a
 
 ## What this is not
 
-- Not a chatbot. There is no open-ended "ask me anything" box that answers questions directly.
+- Not an unconstrained answer bot. The current code-practice loop stays
+  non-evaluative before repair; the newer study-workspace direction may answer
+  questions only from student-selected, permitted sources with citations.
 - Not a grading system. It never produces a score, a mastery percentage, or a pass/fail judgment from a model's opinion.
 - Not a hardcoded demo. The engine is fixture-driven and content-agnostic; every scenario runs through the same pipeline, and it generates fresh scenarios rather than repeating a fixed set.
 - Not something you install, configure, pay for, or need a technical background for — it lives inside ChatGPT and Codex.

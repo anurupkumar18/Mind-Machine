@@ -1,5 +1,30 @@
 # Canvas integration
 
+> **Document status:** current mock behavior, historical access investigation, and
+> future possibilities coexist here. None proves production permission or selects
+> the final architecture. See
+> [`research/INITIAL_RESEARCH_AND_INSPIRATION.md`](research/INITIAL_RESEARCH_AND_INSPIRATION.md)
+> for earlier leads and explicit discrepancies that require fresh verification.
+
+## September 2026 product direction (not implemented)
+
+The team has agreed to explore Canvas as one possible entry point into a broader,
+institution-supported Evidence Engine experience. The north star is not merely a
+one-time API import: when a student enrolls, a professor- and IT-approved class
+package could make the right skills, guardrails, hooks, tools, plugins, MCP servers,
+and course context available with minimal setup. A companion browser extension is
+also an option to investigate where it is permitted and meaningfully improves the
+student experience.
+
+Neither Canvas provisioning nor a browser extension is approved, verified, or
+selected as the architecture. Both must be evaluated with professors and university
+IT for consent, privacy, security, data retention, procurement, support ownership,
+and platform-policy compliance. They are complementary possibilities, not permission
+workarounds. The current mock-only status and invariant I4 remain unchanged.
+
+See [`TEAM_PRODUCT_DIRECTION.md`](TEAM_PRODUCT_DIRECTION.md) for the complete group
+decision and the boundary between product direction and current capability.
+
 ## Status: mock mode
 
 Real Canvas access is confirmed institutionally blocked. Two independent

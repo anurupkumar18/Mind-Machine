@@ -10,6 +10,32 @@
 
 Do not load every memory file. The normal context budget is the index, at most two semantic records, and one episodic handoff.
 
+## Source-of-truth and drift rule
+
+This repository records several pivots and experiments. Do not assume that an
+existing document, API, module, or test describes the desired future product merely
+because it exists.
+
+- `docs/PROJECT_CHARTER.md` is the current operational safety and data contract.
+  Future-direction notes do not weaken it; a conflicting behavior needs a separate,
+  explicit, reviewed charter decision before implementation.
+- `docs/TEAM_PRODUCT_DIRECTION.md` records the latest agreed north star. It guides
+  discovery, not claims about implemented capability or institutional permission.
+- Source code and passing tests establish current behavior only. They are evidence
+  of what the repository does now, not automatic product requirements.
+- `docs/IMPLEMENTATION_PLAN.md` and the latest episodic handoff are dated working
+  plans. Reconfirm them against the charter and latest human decision before use.
+- `docs/research/INITIAL_RESEARCH_AND_INSPIRATION.md`, older plans, and older
+  episodic records are historical inputs. Mine them for ideas; never promote them
+  silently into requirements.
+
+When sources disagree, name the discrepancy and stop treating either side as an
+implicit decision. Record the intended observable behavior and what it supersedes
+before editing code. Each implementation slice must identify stale paths it makes
+obsolete, search for their callers, and either remove them safely with tests or
+record a bounded follow-up. Avoid compatibility layers, duplicate abstractions, and
+dead code that exist only because the project once pointed in another direction.
+
 ## Product invariants (I1-I8, full rationale in `docs/IMPLEMENTATION_PLAN.md` §1 / `docs/PROJECT_CHARTER.md`)
 
 - **I1** Never read, modify, execute, or operate on a student's actual coursework, homework, exam, quiz, or discussion content. All practice content is curated, procedurally generated, or drawn from a vetted reference-implementation catalog. Anything a student pastes is a topic hint at most, never literal content to mutate and hand back.
@@ -31,4 +57,3 @@ Do not load every memory file. The normal context budget is the index, at most t
 - Run the narrowest relevant check before committing; run `make check` before merge.
 - Report changed files, checks, evidence, risks, and next action. Never record private prompts or raw chain-of-thought in memory.
 - Use `.github/pull_request_template.md`'s checklist on every PR.
-

@@ -4,6 +4,20 @@
 
 Evidence Engine gives learners low-stakes code-repair practice and returns reproducible evidence from tests executed in a controlled verifier Evidence Engine itself runs. The host model may coach and interpret results, but it never creates the authoritative verdict. It is not a generic tutor, a grading system, or a mastery estimator.
 
+> **Direction recorded, contract unchanged (2026-09-02):** the team has agreed on
+> a broader north star involving institution-managed class packages,
+> NotebookLM-style source-grounded study support, and possible Canvas or browser
+> integration. This decision is documented in
+> [`TEAM_PRODUCT_DIRECTION.md`](TEAM_PRODUCT_DIRECTION.md), but it does not modify
+> this charter. I1–I8 remain authoritative until a separate team-reviewed revision
+> reconciles course materials, persistence, institutional provisioning,
+> direct-answer behavior, privacy, and access control.
+>
+> Historical research and existing prototype code are not amendments to this
+> contract. Conflicts are cataloged in
+> [`research/INITIAL_RESEARCH_AND_INSPIRATION.md`](research/INITIAL_RESEARCH_AND_INSPIRATION.md)
+> and require an explicit reviewed decision.
+
 ## Non-negotiable invariants
 
 Every design decision and every PR must satisfy all of these. See `docs/IMPLEMENTATION_PLAN.md` §2 for the full rationale behind each.
